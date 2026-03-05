@@ -1,9 +1,7 @@
 import Hero from "@/components/Hero";
-import Navigation from "@/components/Navigation";
 import Itinerary from "@/components/Itinerary";
 import Accommodation from "@/components/Accommodation";
 import ParkGuide from "@/components/ParkGuide";
-import DrivingLogistics from "@/components/DrivingLogistics";
 import FoodGuide from "@/components/FoodGuide";
 import Activities from "@/components/Activities";
 import BudgetCalculator from "@/components/BudgetCalculator";
@@ -13,13 +11,11 @@ import Footer from "@/components/Footer";
 
 export default function Home() {
   return (
-    <main>
+    <main className="-mt-16">
       <Hero />
-      <Navigation />
       <Itinerary />
       <Accommodation />
       <ParkGuide />
-      <DrivingLogistics />
       <FoodGuide />
       <Activities />
       <BudgetCalculator />

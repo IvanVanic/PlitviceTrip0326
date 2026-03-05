@@ -82,7 +82,7 @@ export default function Footer() {
               className="font-body text-sm leading-relaxed mb-2"
               style={{ color: "var(--color-earth-200)" }}
             >
-              Built with research and <HeartIcon /> love for our 5th anniversary.
+              5th anniversary trip — planned with <HeartIcon /> and research.
             </p>
             <p
               className="font-body text-sm font-medium"

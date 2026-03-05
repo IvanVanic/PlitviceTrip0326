@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Inter } from "next/font/google";
+import Navigation from "@/components/Navigation";
+import { TripProvider } from "@/context/TripContext";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -15,8 +17,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Plitvice Trip — March 2026",
-  description: "Our 5th anniversary adventure to Plitvice Lakes",
+  title: "Plitvice Lakes — 5th Anniversary Trip",
+  description: "5th anniversary trip to Plitvice Lakes, March 25-27, 2026",
 };
 
 export default function RootLayout({
@@ -26,7 +28,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${playfair.variable} ${inter.variable}`}>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <TripProvider>
+          <Navigation />
+          {children}
+        </TripProvider>
+      </body>
     </html>
   );
 }

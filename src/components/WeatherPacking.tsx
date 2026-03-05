@@ -392,7 +392,7 @@ export default function WeatherPacking() {
   const resetAll = () => setChecked({});
 
   return (
-    <section id="packing" className="bg-warm-white py-16 px-4">
+    <section id="packing" className="bg-warm-white py-12 px-4 sm:py-16 sm:px-6">
       <div className="max-w-5xl mx-auto">
         {/* Heading */}
         <div className="text-center mb-12">

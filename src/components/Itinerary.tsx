@@ -381,7 +381,7 @@ function ActivityCard({
       </div>
 
       {/* Card */}
-      <div className="bg-warm-white rounded-2xl border border-earth-100 shadow-sm p-4">
+      <div className="bg-warm-white rounded-2xl border border-earth-100 shadow-sm p-3 sm:p-4">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -523,7 +523,7 @@ export default function Itinerary() {
   return (
     <section
       id="itinerary"
-      className="py-16 px-4 bg-earth-50"
+      className="py-12 px-4 sm:py-16 sm:px-6 bg-earth-50"
       aria-labelledby="itinerary-heading"
     >
       <div className="max-w-3xl mx-auto">
@@ -558,7 +558,7 @@ export default function Itinerary() {
               aria-controls={`day-panel-${i}`}
               onClick={() => setActiveDay(i)}
               className={[
-                "shrink-0 rounded-2xl px-5 py-3 text-left transition-all duration-200 border",
+                "shrink-0 min-w-[120px] rounded-2xl px-5 py-3 text-left transition-all duration-200 border",
                 activeDay === i
                   ? "bg-forest-700 text-white border-forest-700 shadow-md"
                   : "bg-warm-white text-stone-dark border-earth-100 hover:border-forest-300 hover:bg-forest-50",

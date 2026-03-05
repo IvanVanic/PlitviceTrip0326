@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
+import { useTrip } from "@/context/TripContext";
 
 type Activity = {
   id: string;
@@ -345,24 +346,13 @@ function ActivityCard({
 }
 
 export default function Activities() {
-  const [includedActivities, setIncludedActivities] = useState<Set<string>>(
-    new Set(["rastoke", "stargazing"])
-  );
-  const [selectedDay3, setSelectedDay3] = useState<string>("rastoke-morning");
-
-  const toggleActivity = (id: string) => {
-    setIncludedActivities((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) next.delete(id);
-      else next.add(id);
-      return next;
-    });
-  };
+  const { state, toggleActivity, setDay3Option } = useTrip();
+  const { includedActivities, day3Option: selectedDay3 } = state;
 
   const includedCount = includedActivities.size;
 
   return (
-    <section id="activities" className="py-16 px-4 bg-earth-50">
+    <section id="activities" className="py-12 px-4 sm:py-16 sm:px-6 bg-earth-50">
       <div className="max-w-6xl mx-auto">
         {/* Heading */}
         <div className="text-center mb-10">
@@ -434,7 +424,7 @@ export default function Activities() {
               return (
                 <button
                   key={option.id}
-                  onClick={() => setSelectedDay3(option.id)}
+                  onClick={() => setDay3Option(option.id)}
                   className={[
                     "text-left p-5 rounded-2xl border-2 transition-all duration-200 flex items-start gap-4",
                     isSelected

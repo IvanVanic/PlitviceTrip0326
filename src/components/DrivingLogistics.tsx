@@ -325,7 +325,7 @@ function WinterWarning() {
 
 export default function DrivingLogistics() {
   return (
-    <section id="driving" className="py-16 px-4 bg-earth-50">
+    <section id="driving" className="py-12 px-4 sm:py-16 sm:px-6 bg-earth-50">
       <div className="max-w-6xl mx-auto">
 
         {/* Section heading */}

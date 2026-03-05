@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useTrip } from "@/context/TripContext";
 
 type Accommodation = {
   id: string;
@@ -165,13 +166,13 @@ function AccommodationCard({
           : "border-earth-100",
       ].join(" ")}
     >
-      {/* Our Pick ribbon */}
+      {/* Top Pick ribbon */}
       {isRecommended && (
         <div className="absolute -top-3 left-5 inline-flex items-center gap-1.5 bg-earth-600 text-warm-white text-xs font-body font-semibold px-3 py-1 rounded-full shadow-sm">
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
-          Our Pick
+          Top Pick
         </div>
       )}
 
@@ -300,6 +301,7 @@ function AccommodationCard({
 }
 
 export default function Accommodation() {
+  const { setAccommodation } = useTrip();
   const [activeFilter, setActiveFilter] = useState<Filter>("all");
   const [favorites, setFavorites] = useState<Set<string>>(new Set());
 
@@ -329,10 +331,12 @@ export default function Accommodation() {
       else next.add(id);
       return next;
     });
+    // Sync selected accommodation to shared context for budget calculation
+    setAccommodation(id);
   };
 
   return (
-    <section id="accommodation" className="py-16 px-4 bg-earth-50">
+    <section id="accommodation" className="py-12 px-4 sm:py-16 sm:px-6 bg-warm-white">
       <div className="max-w-6xl mx-auto">
         {/* Section heading */}
         <div className="text-center mb-10">
@@ -340,10 +344,10 @@ export default function Accommodation() {
             Night 1 &amp; 2
           </p>
           <h2 className="font-heading text-4xl sm:text-5xl text-stone-dark mb-3">
-            Where We&apos;re Staying
+            Accommodation
           </h2>
           <p className="font-body text-stone-mid text-base max-w-lg mx-auto">
-            She&apos;s booking — but here are the options we&apos;re choosing from
+            Top picks near the park, compared
           </p>
         </div>
 

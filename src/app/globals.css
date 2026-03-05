@@ -49,6 +49,30 @@
 /* Smooth scrolling */
 html {
   scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+/* Mobile-first tap target utility */
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Consistent section padding — mobile-first */
+.section-padding {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .section-padding {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
 }
 
 body {

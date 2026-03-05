@@ -56,7 +56,7 @@ export default function Hero() {
 
         {/* Main heading */}
         <h1
-          className="font-heading text-6xl sm:text-7xl md:text-8xl text-warm-white leading-none mb-4"
+          className="font-heading text-5xl sm:text-6xl md:text-8xl text-warm-white leading-none mb-4"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.2s both" }}
         >
           Plitvice
@@ -69,12 +69,12 @@ export default function Hero() {
           className="font-heading text-xl sm:text-2xl text-earth-200 mb-3 italic"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.35s both" }}
         >
-          Our 5th Anniversary Adventure
+          5th Anniversary Adventure
         </p>
 
         {/* Date badge */}
         <div
-          className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 mb-10 backdrop-blur-sm"
+          className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 mb-8 backdrop-blur-sm"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.5s both" }}
         >
           <svg
@@ -102,7 +102,7 @@ export default function Hero() {
           style={{ animation: "heroFadeIn 1.4s ease-out 0.65s both" }}
         >
           Three days of waterfalls, hidden trails, and the best trout in
-          Croatia. A trip plan built with love{" "}
+          Croatia. Planned with love{" "}
           <span className="text-earth-300">(and way too much research).</span>
         </p>
 
@@ -113,7 +113,7 @@ export default function Hero() {
         >
           <a
             href="#itinerary"
-            className="inline-flex items-center gap-2 bg-forest-700 hover:bg-forest-600 text-white font-body font-semibold rounded-xl px-7 py-3 transition-colors duration-200 shadow-lg"
+            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-forest-700 hover:bg-forest-600 text-white font-body font-semibold rounded-xl px-7 py-3 transition-colors duration-200 shadow-lg"
           >
             View Itinerary
             <svg
@@ -133,7 +133,7 @@ export default function Hero() {
           </a>
           <a
             href="#park-guide"
-            className="inline-flex items-center gap-2 border border-white/30 hover:border-white/60 text-white font-body rounded-xl px-7 py-3 transition-colors duration-200 backdrop-blur-sm"
+            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto border border-white/30 hover:border-white/60 text-white font-body rounded-xl px-7 py-3 transition-colors duration-200 backdrop-blur-sm"
           >
             Park Guide
           </a>

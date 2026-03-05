@@ -241,7 +241,7 @@ export default function BudgetCalculator() {
   return (
     <section
       id="budget"
-      className="bg-earth-50 py-16 px-4"
+      className="bg-warm-white py-12 px-4 sm:py-16 sm:px-6"
     >
       <div className="max-w-5xl mx-auto">
         {/* Heading */}
@@ -361,7 +361,7 @@ export default function BudgetCalculator() {
 
             {/* Accommodation (her cost) */}
             <div className="bg-warm-white rounded-2xl shadow-sm border border-earth-100 p-6">
-              <CategoryHeader title="Accommodation (her cost)" />
+              <CategoryHeader title="Accommodation" />
               <p className="font-body text-xs text-stone-mid mb-3">
                 Estimated at midpoint of price range
               </p>
@@ -429,7 +429,7 @@ export default function BudgetCalculator() {
           </div>
 
           {/* Right column — sticky totals */}
-          <div className="lg:sticky lg:top-6">
+          <div className="lg:sticky lg:top-20">
             <div
               className="rounded-2xl p-6 text-white shadow-xl"
               style={{
@@ -442,10 +442,10 @@ export default function BudgetCalculator() {
               </h3>
 
               <div className="space-y-4">
-                {/* His costs */}
+                {/* Trip expenses */}
                 <div className="bg-white/10 rounded-xl p-4">
                   <p className="font-body text-xs uppercase tracking-widest text-forest-300 mb-1">
-                    His costs
+                    Trip Expenses
                   </p>
                   <p className="font-heading text-3xl text-white">
                     <AnimatedCost value={hisCoreTotal} />
@@ -455,10 +455,10 @@ export default function BudgetCalculator() {
                   </p>
                 </div>
 
-                {/* Her costs */}
+                {/* Accommodation */}
                 <div className="bg-white/10 rounded-xl p-4">
                   <p className="font-body text-xs uppercase tracking-widest text-forest-300 mb-1">
-                    Her costs
+                    Accommodation
                   </p>
                   <p className="font-heading text-3xl text-white">
                     <AnimatedCost value={herAccomMid} />

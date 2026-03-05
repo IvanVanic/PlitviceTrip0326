@@ -315,7 +315,7 @@ function StoreCard({ store }: { store: Store }) {
 // --- Main Component ---
 export default function GearShopping() {
   return (
-    <section id="gear" className="bg-earth-50 py-16 px-4">
+    <section id="gear" className="bg-earth-50 py-12 px-4 sm:py-16 sm:px-6">
       <div className="max-w-5xl mx-auto">
         {/* Heading */}
         <div className="text-center mb-12">
@@ -323,7 +323,7 @@ export default function GearShopping() {
             Gear Up
           </h2>
           <p className="font-body text-stone-mid text-lg">
-            What we need and where to get it in Rijeka
+            Gear needed and where to find it in Rijeka
           </p>
         </div>
 

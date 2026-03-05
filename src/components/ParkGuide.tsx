@@ -201,7 +201,7 @@ export default function ParkGuide() {
   return (
     <section
       id="park-guide"
-      className="py-16 px-4 bg-warm-white"
+      className="py-12 px-4 sm:py-16 sm:px-6 bg-warm-white"
       aria-labelledby="park-guide-heading"
     >
       <div className="max-w-4xl mx-auto">
@@ -225,7 +225,7 @@ export default function ParkGuide() {
         <div className="mb-14">
           <SectionLabel>At a Glance</SectionLabel>
           <SectionHeading>Key Numbers</SectionHeading>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             {KEY_NUMBERS.map((item) => (
               <div
                 key={item.label}

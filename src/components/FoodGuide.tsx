@@ -301,7 +301,7 @@ export default function FoodGuide() {
   const visibleRestaurants = showAllRestaurants ? restaurants : restaurants.slice(0, 3);
 
   return (
-    <section id="food" className="py-16 px-4 bg-warm-white">
+    <section id="food" className="py-12 px-4 sm:py-16 sm:px-6 bg-earth-50">
       <div className="max-w-6xl mx-auto">
         {/* Heading */}
         <div className="text-center mb-4">
@@ -309,7 +309,7 @@ export default function FoodGuide() {
             Eat Well, Eat Local
           </p>
           <h2 className="font-heading text-4xl sm:text-5xl text-stone-dark mb-3">
-            Where We&apos;re Eating
+            Food &amp; Dining
           </h2>
         </div>
 
@@ -317,7 +317,7 @@ export default function FoodGuide() {
         <div className="flex items-center justify-center gap-2.5 mb-10 p-3 bg-forest-50 border border-forest-200 rounded-2xl max-w-sm mx-auto">
           <LeafIcon className="w-5 h-5 text-forest-600 shrink-0" />
           <p className="font-body text-sm text-forest-800 font-medium">
-            She&apos;s vegetarian / pescetarian — all options noted below
+            Vegetarian and pescetarian options noted below
           </p>
         </div>
 
