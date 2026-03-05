@@ -1,0 +1,191 @@
+@import "tailwindcss";
+
+@theme {
+  /* Earthy, natural palette */
+  --color-forest-950: #0a1f0d;
+  --color-forest-900: #132b16;
+  --color-forest-800: #1e3a22;
+  --color-forest-700: #2d5a33;
+  --color-forest-600: #3d7a45;
+  --color-forest-500: #4d9a57;
+  --color-forest-400: #6db876;
+  --color-forest-300: #94d49b;
+  --color-forest-200: #c1e8c5;
+  --color-forest-100: #e3f5e5;
+  --color-forest-50: #f0faf1;
+
+  --color-water-900: #0c2d4a;
+  --color-water-800: #134a6e;
+  --color-water-700: #1a6792;
+  --color-water-600: #2185b6;
+  --color-water-500: #32a3d4;
+  --color-water-400: #5cbde2;
+  --color-water-300: #8ad4ed;
+  --color-water-200: #b8e7f5;
+  --color-water-100: #ddf3fa;
+  --color-water-50: #eef9fd;
+
+  --color-earth-900: #3d2a1a;
+  --color-earth-800: #5c3f28;
+  --color-earth-700: #7a5436;
+  --color-earth-600: #996a44;
+  --color-earth-500: #b88052;
+  --color-earth-400: #cda07a;
+  --color-earth-300: #ddbfa2;
+  --color-earth-200: #eddecb;
+  --color-earth-100: #f5ede0;
+  --color-earth-50: #faf6f0;
+
+  --color-cream: #faf8f4;
+  --color-warm-white: #fefdfb;
+  --color-stone-dark: #2c2825;
+  --color-stone-mid: #5c5652;
+
+  /* Fonts */
+  --font-heading: "Playfair Display", Georgia, serif;
+  --font-body: "Inter", system-ui, sans-serif;
+}
+
+/* ── Smooth scrolling ─────────────────────────────────────────────────────── */
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+/* ── Body defaults ────────────────────────────────────────────────────────── */
+body {
+  font-family: var(--font-body);
+  color: var(--color-stone-dark);
+  background-color: var(--color-warm-white);
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-heading);
+}
+
+/* ── Text selection color ─────────────────────────────────────────────────── */
+::selection {
+  background: var(--color-forest-100);
+  color: var(--color-forest-900);
+}
+
+/* ── Focus styles ─────────────────────────────────────────────────────────── */
+*:focus-visible {
+  outline: 2px solid var(--color-forest-500);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ── Custom scrollbar (webkit) ────────────────────────────────────────────── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-earth-50);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-forest-400);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-forest-600);
+}
+
+/* ── Tap target utility ───────────────────────────────────────────────────── */
+.tap-target {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* ── Consistent section padding — mobile-first ───────────────────────────── */
+.section-padding {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+@media (min-width: 640px) {
+  .section-padding {
+    padding-top: 4rem;
+    padding-bottom: 4rem;
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+/* ── Scroll-triggered fade-in animation ──────────────────────────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-on-scroll {
+  opacity: 0;
+  animation: fadeInUp 0.6s ease-out forwards;
+  animation-play-state: paused;
+}
+
+.animate-on-scroll.is-visible {
+  animation-play-state: running;
+}
+
+/* Staggered delays for child elements in a reveal group */
+.animate-on-scroll[data-delay="100"] { animation-delay: 0.1s; }
+.animate-on-scroll[data-delay="150"] { animation-delay: 0.15s; }
+.animate-on-scroll[data-delay="200"] { animation-delay: 0.2s; }
+.animate-on-scroll[data-delay="250"] { animation-delay: 0.25s; }
+.animate-on-scroll[data-delay="300"] { animation-delay: 0.3s; }
+.animate-on-scroll[data-delay="400"] { animation-delay: 0.4s; }
+
+/* ── Section heading accent underline ────────────────────────────────────── */
+.heading-accent {
+  position: relative;
+  display: inline-block;
+}
+
+.heading-accent::after {
+  content: "";
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 48px;
+  height: 3px;
+  border-radius: 2px;
+  background: linear-gradient(
+    90deg,
+    var(--color-forest-500),
+    var(--color-water-500)
+  );
+}
+
+/* ── Horizontal scroll snap for day tabs ─────────────────────────────────── */
+.scroll-snap-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scroll-snap-x > * {
+  scroll-snap-align: start;
+}
+
+/* ── Hide scrollbar visually but keep scroll functionality ───────────────── */
+.scrollbar-hidden {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none;
+}
