@@ -1,4 +1,5 @@
-import React, { useEffect, useRef } from "react";
+"use client";
+import React, { useEffect, useRef, useState } from "react";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -148,22 +149,39 @@ const HIDDEN_GEMS = [
 
 const MARCH_ADVANTAGES = [
   {
-    icon: "💧",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 2C8 8 5 12 5 15a7 7 0 0014 0c0-3-3-7-7-13z" />
+      </svg>
+    ),
     label: "Peak waterfall flow",
     description: "Snowmelt means maximum water volume",
   },
   {
-    icon: "🌿",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0" />
+      </svg>
+    ),
     label: "No crowds",
     description: "Summer gets 10,000+ visitors/day",
   },
   {
-    icon: "€",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+      </svg>
+    ),
     label: "€10 tickets",
     description: "vs €40 in peak summer",
   },
   {
-    icon: "📷",
+    icon: (
+      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+    ),
     label: "Perfect light",
     description: "Low winter sun for golden-hour shots all day",
   },
@@ -226,10 +244,10 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 export default function ParkGuide() {
   const headingRef = useScrollReveal<HTMLDivElement>();
   const keyNumbersRef = useScrollReveal<HTMLDivElement>();
-  const whatsOpenRef = useScrollReveal<HTMLDivElement>();
   const routesRef = useScrollReveal<HTMLDivElement>();
   const gemsRef = useScrollReveal<HTMLDivElement>();
   const marchRef = useScrollReveal<HTMLDivElement>();
+  const [selectedRoute, setSelectedRoute] = useState<string>("Route C");
 
   return (
     <section
@@ -252,7 +270,7 @@ export default function ParkGuide() {
           </h2>
           <p className="font-body text-stone-mid text-sm sm:text-base max-w-xl mx-auto mt-4">
             Everything you need to know about Plitvice Lakes National Park for
-            a late-March visit — prices, routes, what's open, and where to go
+            a late-March visit — prices, routes, what&apos;s open, and where to go
             off the beaten path.
           </p>
         </div>
@@ -264,103 +282,28 @@ export default function ParkGuide() {
         >
           <SectionLabel>At a Glance</SectionLabel>
           <SectionHeading>Key Numbers</SectionHeading>
-          {/* 2-col on mobile, 3-col on sm, 5-col on lg */}
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {KEY_NUMBERS.map((item) => (
               <div
                 key={item.label}
                 className={[
-                  "rounded-2xl border p-4 flex flex-col gap-2 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200",
+                  "rounded-2xl p-5 flex flex-col gap-1 border-l-4 shadow-sm",
                   item.highlight
-                    ? "bg-earth-50 border-earth-300"
-                    : "bg-warm-white border-earth-100",
+                    ? "bg-earth-50 border-l-earth-500"
+                    : "bg-warm-white border-l-forest-500",
                 ].join(" ")}
               >
-                <div
-                  className={[
-                    "w-9 h-9 rounded-xl flex items-center justify-center",
-                    item.highlight
-                      ? "bg-earth-200 text-earth-700"
-                      : "bg-forest-50 text-forest-700",
-                  ].join(" ")}
-                >
-                  {item.icon}
+                <div className="font-heading text-3xl text-stone-dark leading-none mb-1">
+                  {item.value}
                 </div>
-                <div>
-                  <div className="font-heading text-xl text-stone-dark leading-tight">
-                    {item.value}
-                  </div>
-                  <div className="font-body text-xs font-semibold text-stone-dark mt-0.5">
-                    {item.label}
-                  </div>
-                  <div className="font-body text-xs text-stone-mid mt-0.5">
-                    {item.sub}
-                  </div>
+                <div className="font-body text-xs font-semibold text-stone-dark leading-snug">
+                  {item.label}
+                </div>
+                <div className="font-body text-xs text-stone-mid leading-snug">
+                  {item.sub}
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-
-        {/* ── What's Open in March ─────────────────────────────────────────── */}
-        <div
-          ref={whatsOpenRef}
-          className="mb-14 animate-on-scroll"
-        >
-          <SectionLabel>March Conditions</SectionLabel>
-          <SectionHeading>What's Open</SectionHeading>
-          {/* Stacks on mobile, side-by-side on sm */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {/* Open */}
-            <div className="bg-forest-50 border border-forest-200 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded-full bg-forest-600 flex items-center justify-center">
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7" />
-                  </svg>
-                </div>
-                <h4 className="font-heading text-lg text-forest-800">Open</h4>
-              </div>
-              <ul className="space-y-2">
-                {OPEN_CLOSED.open.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 font-body text-sm text-forest-800"
-                  >
-                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-forest-500 shrink-0" aria-hidden="true" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {/* Closed / limited */}
-            <div className="bg-earth-50 border border-earth-200 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
-              <div className="flex items-center gap-2 mb-4">
-                <div className="w-6 h-6 rounded-full bg-earth-400 flex items-center justify-center">
-                  <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </div>
-                <h4 className="font-heading text-lg text-earth-800">
-                  Closed / Limited
-                </h4>
-              </div>
-              <ul className="space-y-2">
-                {OPEN_CLOSED.closed.map((item) => (
-                  <li
-                    key={item}
-                    className="flex items-start gap-2 font-body text-sm text-earth-700"
-                  >
-                    <span className="mt-1 w-1.5 h-1.5 rounded-full bg-earth-400 shrink-0" aria-hidden="true" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-              <p className="font-body text-xs text-earth-600 mt-4 pt-3 border-t border-earth-200">
-                Always call ahead to confirm — see the CTA box below.
-              </p>
-            </div>
           </div>
         </div>
 
@@ -371,64 +314,95 @@ export default function ParkGuide() {
         >
           <SectionLabel>Route Comparison</SectionLabel>
           <SectionHeading>Choose Your Route</SectionHeading>
-          {/* Single col on mobile, 2-col on sm */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {ROUTES.map((route) => (
-              <div
-                key={route.name}
-                className={[
-                  "relative rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
-                  route.avoid
-                    ? "bg-earth-50 border-earth-200 opacity-60"
-                    : route.recommended
-                    ? "bg-water-50 border-water-300 shadow-sm"
-                    : "bg-warm-white border-earth-100",
-                ].join(" ")}
-              >
-                {route.recommended && (
-                  <div className="absolute -top-2.5 left-4">
-                    <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-body font-semibold bg-water-500 text-white shadow-sm">
-                      Recommended
-                    </span>
-                  </div>
-                )}
-                {route.avoid && (
-                  <div className="absolute -top-2.5 left-4">
-                    <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-body font-semibold bg-earth-400 text-white shadow-sm">
-                      Skip in March
-                    </span>
-                  </div>
-                )}
-                <div className="flex items-start justify-between gap-2 mb-2 mt-1">
-                  <h4 className="font-heading text-xl text-stone-dark">
-                    {route.name}
-                  </h4>
-                  <div className="text-right shrink-0">
-                    <div className="font-body text-sm font-semibold text-stone-dark">
-                      {route.distance}
-                    </div>
-                    <div className="font-body text-xs text-stone-mid">
-                      {route.duration}
-                    </div>
-                  </div>
-                </div>
-                <p className="font-body text-sm text-stone-mid leading-relaxed mb-3">
-                  {route.description}
-                </p>
-                <div
+            {ROUTES.map((route) => {
+              const isSelected = selectedRoute === route.name;
+              return (
+                <button
+                  key={route.name}
+                  onClick={() => !route.avoid && setSelectedRoute(route.name)}
+                  disabled={route.avoid}
                   className={[
-                    "inline-flex px-3 py-1 rounded-full text-xs font-body font-medium",
+                    "relative rounded-2xl border p-5 text-left transition-all duration-200 w-full",
                     route.avoid
-                      ? "bg-earth-200 text-earth-700"
-                      : route.recommended
-                      ? "bg-water-100 text-water-700"
-                      : "bg-forest-100 text-forest-700",
+                      ? "bg-earth-50 border-earth-200 opacity-50 cursor-not-allowed"
+                      : isSelected
+                      ? "bg-forest-700 border-forest-700 shadow-lg scale-[1.01]"
+                      : "bg-warm-white border-earth-100 hover:-translate-y-0.5 hover:shadow-md hover:border-earth-300 cursor-pointer",
                   ].join(" ")}
+                  aria-pressed={isSelected}
                 >
-                  {route.note}
-                </div>
-              </div>
-            ))}
+                  {route.recommended && !isSelected && (
+                    <div className="absolute -top-2.5 left-4">
+                      <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-body font-semibold bg-water-500 text-white shadow-sm">
+                        Recommended
+                      </span>
+                    </div>
+                  )}
+                  {isSelected && (
+                    <div className="absolute -top-2.5 left-4">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-body font-semibold bg-white text-forest-700 shadow-sm">
+                        <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                          <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                        </svg>
+                        Selected
+                      </span>
+                    </div>
+                  )}
+                  {route.avoid && (
+                    <div className="absolute -top-2.5 left-4">
+                      <span className="inline-flex px-2.5 py-0.5 rounded-full text-xs font-body font-semibold bg-earth-400 text-white shadow-sm">
+                        Skip in March
+                      </span>
+                    </div>
+                  )}
+                  <div className="flex items-start justify-between gap-2 mb-2 mt-1">
+                    <h4 className={["font-heading text-xl", isSelected ? "text-white" : "text-stone-dark"].join(" ")}>
+                      {route.name}
+                    </h4>
+                    <div className="text-right shrink-0">
+                      <div className={["font-body text-sm font-semibold", isSelected ? "text-white" : "text-stone-dark"].join(" ")}>
+                        {route.distance}
+                      </div>
+                      <div className={["font-body text-xs", isSelected ? "text-white/70" : "text-stone-mid"].join(" ")}>
+                        {route.duration}
+                      </div>
+                    </div>
+                  </div>
+                  <p className={["font-body text-sm leading-relaxed mb-3", isSelected ? "text-white/80" : "text-stone-mid"].join(" ")}>
+                    {route.description}
+                  </p>
+                  <div
+                    className={[
+                      "inline-flex px-3 py-1 rounded-full text-xs font-body font-medium",
+                      route.avoid
+                        ? "bg-earth-200 text-earth-700"
+                        : isSelected
+                        ? "bg-white/20 text-white"
+                        : route.recommended
+                        ? "bg-water-100 text-water-700"
+                        : "bg-forest-100 text-forest-700",
+                    ].join(" ")}
+                  >
+                    {route.note}
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Selected route summary */}
+          <div className="mt-4 p-4 bg-forest-50 border border-forest-200 rounded-2xl flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-forest-700 text-white flex items-center justify-center shrink-0">
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
+              </svg>
+            </div>
+            <p className="font-body text-sm text-forest-800">
+              <span className="font-semibold">Your route: {selectedRoute}</span>
+              {" — "}
+              {ROUTES.find((r) => r.name === selectedRoute)?.description}
+            </p>
           </div>
         </div>
 
@@ -443,7 +417,8 @@ export default function ParkGuide() {
             {HIDDEN_GEMS.map((gem) => (
               <div
                 key={gem.num}
-                className="border-b border-earth-100 last:border-b-0 py-4 flex gap-4 hover:bg-forest-50/50 rounded-xl px-2 -mx-2 transition-colors duration-150"
+                className="border-b border-earth-100 last:border-b-0 py-4 flex gap-4 rounded-xl px-3 -mx-3 transition-all duration-200 hover:shadow-sm"
+                style={{ background: gem.num % 2 === 0 ? 'rgba(33,133,182,0.04)' : 'rgba(61,122,69,0.04)' }}
               >
                 <div className="shrink-0 w-8 h-8 rounded-full bg-forest-700 text-white flex items-center justify-center font-heading text-sm font-bold">
                   {gem.num}
@@ -468,24 +443,66 @@ export default function ParkGuide() {
         >
           <SectionLabel>Why March is Great</SectionLabel>
           <SectionHeading>March Advantages</SectionHeading>
-          {/* 2-col on mobile, 4-col on sm */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-            {MARCH_ADVANTAGES.map((adv) => (
-              <div
-                key={adv.label}
-                className="bg-forest-50 border border-forest-100 rounded-2xl p-4 text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
-              >
-                <div className="text-2xl mb-2" aria-hidden="true">
-                  {adv.icon}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Card 1 — Peak waterfall flow */}
+            <div className="group flex items-start gap-4 bg-forest-50 border border-forest-200 border-l-4 border-l-forest-500 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
+              <div className="shrink-0 w-12 h-12 rounded-xl bg-forest-700 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+                {MARCH_ADVANTAGES[0].icon}
+              </div>
+              <div className="min-w-0">
+                <div className="font-heading text-xl text-forest-800 leading-tight mb-1">
+                  {MARCH_ADVANTAGES[0].label}
                 </div>
-                <div className="font-body text-sm font-semibold text-forest-800 mb-1">
-                  {adv.label}
-                </div>
-                <div className="font-body text-xs text-forest-600 leading-snug">
-                  {adv.description}
+                <div className="font-body text-sm text-forest-600 leading-relaxed">
+                  {MARCH_ADVANTAGES[0].description}
                 </div>
               </div>
-            ))}
+            </div>
+
+            {/* Card 2 — No crowds */}
+            <div className="group flex items-start gap-4 bg-water-50 border border-water-200 border-l-4 border-l-water-500 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
+              <div className="shrink-0 w-12 h-12 rounded-xl bg-water-500 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+                {MARCH_ADVANTAGES[1].icon}
+              </div>
+              <div className="min-w-0">
+                <div className="font-heading text-xl text-water-700 leading-tight mb-1">
+                  {MARCH_ADVANTAGES[1].label}
+                </div>
+                <div className="font-body text-sm text-water-600 leading-relaxed">
+                  {MARCH_ADVANTAGES[1].description}
+                </div>
+              </div>
+            </div>
+
+            {/* Card 3 — €10 tickets */}
+            <div className="group flex items-start gap-4 bg-earth-50 border border-earth-200 border-l-4 border-l-earth-500 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
+              <div className="shrink-0 w-12 h-12 rounded-xl bg-earth-500 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+                {MARCH_ADVANTAGES[2].icon}
+              </div>
+              <div className="min-w-0">
+                <div className="font-heading text-xl text-earth-700 leading-tight mb-1">
+                  {MARCH_ADVANTAGES[2].label}
+                </div>
+                <div className="font-body text-sm text-earth-600 leading-relaxed">
+                  {MARCH_ADVANTAGES[2].description}
+                </div>
+              </div>
+            </div>
+
+            {/* Card 4 — Perfect light */}
+            <div className="group flex items-start gap-4 bg-warm-white border border-earth-200 border-l-4 border-l-earth-600 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
+              <div className="shrink-0 w-12 h-12 rounded-xl bg-earth-600 text-white flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform duration-200" aria-hidden="true">
+                {MARCH_ADVANTAGES[3].icon}
+              </div>
+              <div className="min-w-0">
+                <div className="font-heading text-xl text-earth-700 leading-tight mb-1">
+                  {MARCH_ADVANTAGES[3].label}
+                </div>
+                <div className="font-body text-sm text-earth-600 leading-relaxed">
+                  {MARCH_ADVANTAGES[3].description}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
 

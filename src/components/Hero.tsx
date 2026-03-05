@@ -4,22 +4,30 @@ export default function Hero() {
   return (
     <section
       id="hero"
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-[calc(100dvh+4rem)] flex items-center justify-center overflow-hidden"
     >
-      {/* Background image */}
-      <img
-        src="https://images.unsplash.com/photo-1590074072786-a66914d668f1?w=1920&q=80"
-        alt=""
+      {/* Background gradient — forest green → deep water teal */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "linear-gradient(160deg, #0d2211 0%, #132b16 25%, #1a4a55 60%, #0c1f2e 100%)",
+        }}
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover"
       />
-
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
+      {/* Subtle radial light — simulates light breaking through canopy */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(33,133,182,0.18) 0%, transparent 70%)",
+        }}
+        aria-hidden="true"
+      />
 
       {/* Content */}
       <div
-        className="relative z-10 text-center px-5 sm:px-6 max-w-3xl mx-auto w-full"
+        className="relative z-10 text-center px-5 sm:px-6 max-w-3xl mx-auto w-full pt-16"
         style={{ animation: "heroFadeIn 1.4s ease-out both" }}
       >
         {/* Eyebrow label */}

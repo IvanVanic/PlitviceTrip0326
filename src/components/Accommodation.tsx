@@ -156,19 +156,21 @@ function AccommodationCard({
   onToggleFavorite: () => void;
 }) {
   const isRecommended = acc.recommended === true;
+  const visibleHighlights = acc.highlights.slice(0, 3);
 
   return (
     <div
       className={[
-        "relative bg-warm-white rounded-2xl shadow-sm border p-6 flex flex-col gap-4 transition-shadow duration-200 hover:shadow-md",
+        "relative bg-warm-white rounded-2xl flex flex-col transition-all duration-200 overflow-visible",
+        "shadow-sm hover:shadow-lg hover:-translate-y-0.5",
         isRecommended
-          ? "border-earth-400 ring-2 ring-earth-300/50"
-          : "border-earth-100",
+          ? "border-2 border-earth-300 ring-1 ring-earth-200/60"
+          : "border border-earth-100",
       ].join(" ")}
     >
-      {/* Top Pick ribbon */}
+      {/* Top Pick ribbon — sits above the card top edge */}
       {isRecommended && (
-        <div className="absolute -top-3 left-5 inline-flex items-center gap-1.5 bg-earth-600 text-warm-white text-xs font-body font-semibold px-3 py-1 rounded-full shadow-sm">
+        <div className="absolute -top-3.5 left-4 z-10 inline-flex items-center gap-1.5 bg-earth-600 text-warm-white text-[11px] font-body font-semibold tracking-wide uppercase px-3 py-1 rounded-full shadow-md">
           <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
             <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
           </svg>
@@ -176,39 +178,23 @@ function AccommodationCard({
         </div>
       )}
 
-      {/* Header row */}
-      <div className="flex items-start justify-between gap-2 pt-1">
-        <div className="flex-1 min-w-0">
-          <span
-            className={[
-              "inline-flex px-2.5 py-0.5 rounded-full text-xs font-body font-medium mb-2",
-              tagColors[acc.tag] ?? "bg-earth-100 text-earth-800",
-            ].join(" ")}
+      {/* ── Card header band ── */}
+      <div className="relative px-5 pt-6 pb-4 border-b border-earth-100">
+        {/* Rating badge — floats top-right of the header */}
+        <div className="absolute top-5 right-5 flex flex-col items-end gap-2">
+          <div
+            className="flex items-baseline gap-0.5 bg-forest-700 text-white px-2.5 py-1.5 rounded-xl shadow-sm"
+            aria-label={`Rating: ${acc.rating} out of 10`}
           >
-            {acc.tag}
-          </span>
-          <h3 className="font-heading text-lg text-stone-dark leading-tight">{acc.name}</h3>
-          <p className="font-body text-xs text-stone-mid mt-0.5 flex items-center gap-1">
-            <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-            </svg>
-            {acc.location}
-          </p>
-        </div>
-
-        {/* Rating + heart */}
-        <div className="flex flex-col items-end gap-2 shrink-0">
-          <div className="flex items-baseline gap-0.5 bg-forest-700 text-white px-2.5 py-1 rounded-xl">
-            <span className="font-heading text-lg font-bold leading-none">{acc.rating}</span>
-            <span className="font-body text-xs opacity-80">/10</span>
+            <span className="font-heading text-xl font-bold leading-none">{acc.rating}</span>
+            <span className="font-body text-[10px] opacity-70 leading-none mb-0.5">/10</span>
           </div>
           <button
             onClick={onToggleFavorite}
             className={[
               "p-1.5 rounded-full transition-all duration-200",
               isFavorite
-                ? "text-earth-600 bg-earth-100"
+                ? "text-earth-600 bg-earth-100 shadow-sm"
                 : "text-stone-mid hover:text-earth-500 hover:bg-earth-50",
             ].join(" ")}
             aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
@@ -216,86 +202,174 @@ function AccommodationCard({
             <HeartIcon filled={isFavorite} />
           </button>
         </div>
-      </div>
 
-      {/* Price + distance */}
-      <div className="flex flex-wrap gap-2 text-sm font-body">
-        <span className="flex items-center gap-1 text-forest-800 font-semibold">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {acc.priceRange}
+        {/* Category tag */}
+        <span
+          className={[
+            "inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-body font-semibold tracking-wide mb-2.5",
+            tagColors[acc.tag] ?? "bg-earth-100 text-earth-800",
+          ].join(" ")}
+        >
+          {acc.tag}
         </span>
-        <span className="flex items-center gap-1 text-stone-mid">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-          </svg>
-          {acc.distance}
-        </span>
-      </div>
 
-      {/* Breakfast + Jacuzzi indicators */}
-      <div className="flex flex-col gap-1.5 text-sm font-body">
-        <div className={["flex items-center gap-2", acc.breakfastIncluded ? "text-forest-700" : "text-stone-mid"].join(" ")}>
-          {acc.breakfastIncluded ? (
-            <CheckIcon className="w-4 h-4 text-forest-600" />
-          ) : (
-            <XIcon className="w-4 h-4 text-earth-400" />
-          )}
-          <span>
-            Breakfast{" "}
-            {acc.breakfastIncluded ? (
-              <span className="font-semibold text-forest-700">included</span>
-            ) : (
-              <span className="text-stone-mid">{acc.breakfastNote}</span>
-            )}
-          </span>
-        </div>
-        <div className={["flex items-start gap-2", acc.hasJacuzzi ? "text-water-700" : "text-stone-mid"].join(" ")}>
-          {acc.hasJacuzzi ? (
-            <CheckIcon className="w-4 h-4 text-water-600 mt-0.5 shrink-0" />
-          ) : (
-            <XIcon className="w-4 h-4 text-earth-400 mt-0.5 shrink-0" />
-          )}
-          <span>
-            {acc.hasJacuzzi ? (
-              <span className="font-semibold text-water-700">{acc.jacuzziType}</span>
-            ) : (
-              "No jacuzzi"
-            )}
-          </span>
+        {/* Hotel name — the primary visual anchor */}
+        <h3 className="font-heading text-xl text-stone-dark leading-snug pr-20">
+          {acc.name}
+        </h3>
+
+        {/* Location + distance metadata */}
+        <div className="flex flex-col gap-0.5 mt-1.5">
+          <p className="font-body text-xs text-stone-mid flex items-center gap-1">
+            <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            <span className="font-medium text-stone-dark">{acc.location}</span>
+            <span className="text-stone-mid/60">·</span>
+            <span>{acc.distance}</span>
+          </p>
         </div>
       </div>
 
-      {/* Vibe */}
-      <p className="font-body text-sm text-stone-mid italic leading-relaxed border-l-2 border-earth-200 pl-3">
-        {acc.vibe}
-      </p>
+      {/* ── Card body ── */}
+      <div className="px-5 py-4 flex flex-col gap-4 flex-1">
 
-      {/* Highlights */}
-      <div className="flex flex-wrap gap-1.5">
-        {acc.highlights.map((h) => (
-          <span
-            key={h}
-            className="inline-flex px-2 py-0.5 rounded-full text-xs font-body font-medium bg-forest-50 text-forest-700 border border-forest-100"
+        {/* Price — visually prominent */}
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="font-body text-[10px] uppercase tracking-widest text-stone-mid mb-0.5">
+              2 nights · 2 guests
+            </p>
+            <p className="font-heading text-2xl text-forest-700 font-bold leading-none">
+              {acc.priceRange}
+            </p>
+          </div>
+        </div>
+
+        {/* Thin divider */}
+        <div className="h-px bg-earth-100" />
+
+        {/* Feature rows — breakfast + jacuzzi */}
+        <div className="flex flex-col gap-2.5">
+          {/* Breakfast row */}
+          <div className="flex items-start gap-3">
+            <div
+              className={[
+                "shrink-0 w-8 h-8 rounded-lg flex items-center justify-center",
+                acc.breakfastIncluded ? "bg-forest-50" : "bg-earth-50",
+              ].join(" ")}
+              aria-hidden="true"
+            >
+              {/* Coffee cup icon */}
+              <svg
+                className={["w-4 h-4", acc.breakfastIncluded ? "text-forest-700" : "text-stone-mid"].join(" ")}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M18 8h1a4 4 0 010 8h-1M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M6 1v3M10 1v3M14 1v3" />
+              </svg>
+            </div>
+            <div className="flex flex-col leading-tight pt-0.5">
+              <span
+                className={[
+                  "font-body text-sm font-semibold",
+                  acc.breakfastIncluded ? "text-forest-700" : "text-stone-dark",
+                ].join(" ")}
+              >
+                Breakfast
+              </span>
+              <span className="font-body text-xs text-stone-mid">
+                {acc.breakfastIncluded ? "Included in price" : acc.breakfastNote ?? "Not included"}
+              </span>
+            </div>
+          </div>
+
+          {/* Jacuzzi row */}
+          <div className="flex items-start gap-3">
+            <div
+              className={[
+                "shrink-0 w-8 h-8 rounded-lg flex items-center justify-center",
+                acc.hasJacuzzi ? "bg-water-50" : "bg-earth-50",
+              ].join(" ")}
+              aria-hidden="true"
+            >
+              {/* Water drop / spa icon */}
+              <svg
+                className={["w-4 h-4", acc.hasJacuzzi ? "text-water-500" : "text-stone-mid"].join(" ")}
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} d="M12 2C8 7 5 10.5 5 14a7 7 0 0014 0c0-3.5-3-7-7-12z" />
+              </svg>
+            </div>
+            <div className="flex flex-col leading-tight pt-0.5">
+              <span
+                className={[
+                  "font-body text-sm font-semibold",
+                  acc.hasJacuzzi ? "text-water-700" : "text-stone-dark",
+                ].join(" ")}
+              >
+                {acc.hasJacuzzi ? "Jacuzzi / Spa" : "No jacuzzi"}
+              </span>
+              {acc.hasJacuzzi && acc.jacuzziType && (
+                <span className="font-body text-xs text-stone-mid leading-snug">
+                  {acc.jacuzziType}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Highlights — max 3, subtle muted pills */}
+        {visibleHighlights.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {visibleHighlights.map((h) => (
+              <span
+                key={h}
+                className="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-body font-medium bg-earth-50 text-earth-600 border border-earth-100"
+              >
+                {h}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* ── Booking CTA — pinned to card bottom ── */}
+      <div className="px-5 pb-5 pt-1 mt-auto">
+        <a
+          href={`https://www.booking.com/searchresults.html?ss=${encodeURIComponent(acc.name + ' Plitvice')}&checkin=2026-03-25&checkout=2026-03-27&group_adults=2`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={[
+            "group w-full inline-flex items-center justify-center gap-2",
+            "bg-forest-700 hover:bg-forest-600 active:bg-forest-800",
+            "text-white font-body font-semibold text-sm",
+            "rounded-xl px-4 py-3",
+            "transition-all duration-200 shadow-sm hover:shadow",
+            "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-forest-700 focus-visible:ring-offset-2",
+          ].join(" ")}
+          aria-label={`Find ${acc.name} on Booking.com`}
+        >
+          <svg className="w-4 h-4 opacity-80" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 105 11a6 6 0 0012 0z" />
+          </svg>
+          Find on Booking.com
+          <svg
+            className="w-3.5 h-3.5 opacity-60 transition-transform duration-200 group-hover:translate-x-0.5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
           >
-            {h}
-          </span>
-        ))}
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+          </svg>
+        </a>
       </div>
-
-      {/* Search link */}
-      <a
-        href={`https://www.booking.com/searchresults.html?ss=${encodeURIComponent(acc.name + ' Plitvice')}&checkin=2026-03-25&checkout=2026-03-27&group_adults=2`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="mt-auto inline-flex items-center justify-center gap-2 bg-forest-700 hover:bg-forest-600 text-white font-body font-semibold text-sm rounded-xl px-4 py-2.5 transition-colors duration-200"
-      >
-        Find on Booking.com
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-        </svg>
-      </a>
     </div>
   );
 }
@@ -311,6 +385,16 @@ export default function Accommodation() {
     { id: "breakfast", label: "Breakfast Included" },
     { id: "under200", label: "Under €200" },
   ];
+
+  const counts = {
+    all: accommodations.length,
+    jacuzzi: accommodations.filter((a) => a.hasJacuzzi).length,
+    breakfast: accommodations.filter((a) => a.breakfastIncluded).length,
+    under200: accommodations.filter((a) => {
+      const m = a.priceRange.match(/€(d+)/);
+      return m ? parseInt(m[1], 10) < 200 : false;
+    }).length,
+  };
 
   const filtered = accommodations.filter((acc) => {
     if (activeFilter === "jacuzzi") return acc.hasJacuzzi;
@@ -366,11 +450,16 @@ export default function Accommodation() {
               aria-pressed={activeFilter === f.id}
             >
               {f.label}
-              {activeFilter === f.id && (
-                <span className="ml-2 bg-white/20 text-white text-xs px-1.5 py-0.5 rounded-full">
-                  {filtered.length}
-                </span>
-              )}
+              <span
+                className={[
+                  "ml-2 text-xs px-1.5 py-0.5 rounded-full transition-colors duration-200",
+                  activeFilter === f.id
+                    ? "bg-white/20 text-white"
+                    : "bg-earth-100 text-stone-mid",
+                ].join(" ")}
+              >
+                {counts[f.id]}
+              </span>
             </button>
           ))}
         </div>
