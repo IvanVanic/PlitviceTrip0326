@@ -1,8 +1,35 @@
 "use client";
 
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 
-// --- Data ---
+// ─── Scroll reveal hook ───────────────────────────────────────────────────────
+
+function useScrollReveal<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
+}
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+
 const WEATHER_DATA = {
   plitvice: {
     name: "Plitvice Lakes",
@@ -112,24 +139,17 @@ const TOTAL_ITEMS = PACKING_CHECKLIST.reduce(
 
 const STORAGE_KEY = "plitvice_packing_checklist";
 
-// --- Helper: stable item key ---
+// ─── Helper: stable item key ──────────────────────────────────────────────────
+
 function itemKey(category: string, item: string) {
   return `${category}__${item}`;
 }
 
-// --- Icons ---
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
 function ThermometerIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
     </svg>
   );
@@ -137,16 +157,7 @@ function ThermometerIcon({ className }: { className?: string }) {
 
 function DropletIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
     </svg>
   );
@@ -154,16 +165,7 @@ function DropletIcon({ className }: { className?: string }) {
 
 function SunIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="5" />
       <line x1="12" y1="1" x2="12" y2="3" />
       <line x1="12" y1="21" x2="12" y2="23" />
@@ -179,16 +181,7 @@ function SunIcon({ className }: { className?: string }) {
 
 function MoonIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
     </svg>
   );
@@ -196,16 +189,7 @@ function MoonIcon({ className }: { className?: string }) {
 
 function WindIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M17.7 7.7a2.5 2.5 0 1 1 1.8 4.3H2" />
       <path d="M9.6 4.6A2 2 0 1 1 11 8H2" />
       <path d="M12.6 19.4A2 2 0 1 0 14 16H2" />
@@ -215,16 +199,7 @@ function WindIcon({ className }: { className?: string }) {
 
 function WarningIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
       <line x1="12" y1="9" x2="12" y2="13" />
       <line x1="12" y1="17" x2="12.01" y2="17" />
@@ -234,16 +209,7 @@ function WarningIcon({ className }: { className?: string }) {
 
 function InfoIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="10" />
       <line x1="12" y1="16" x2="12" y2="12" />
       <line x1="12" y1="8" x2="12.01" y2="8" />
@@ -253,27 +219,19 @@ function InfoIcon({ className }: { className?: string }) {
 
 function CheckIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <polyline points="20 6 9 17 4 12" />
     </svg>
   );
 }
 
-// --- Weather Card ---
+// ─── Weather Card ─────────────────────────────────────────────────────────────
+
 function WeatherCard({ location }: { location: typeof WEATHER_DATA.plitvice }) {
   const isForest = location.color === "forest";
   return (
     <div
-      className={`flex-1 rounded-2xl border p-5 ${
+      className={`flex-1 rounded-2xl border p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200 ${
         isForest
           ? "bg-forest-50 border-forest-200"
           : "bg-water-50 border-water-200"
@@ -288,64 +246,41 @@ function WeatherCard({ location }: { location: typeof WEATHER_DATA.plitvice }) {
       </h3>
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <ThermometerIcon
-            className={`w-5 h-5 shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`}
-          />
+          <ThermometerIcon className={`w-5 h-5 shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`} />
           <div>
             <p className="font-body text-xs text-stone-mid">Daytime high</p>
-            <p className="font-body text-sm font-semibold text-stone-dark">
-              {location.daytimeHigh}
-            </p>
+            <p className="font-body text-sm font-semibold text-stone-dark">{location.daytimeHigh}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <MoonIcon
-            className={`w-5 h-5 shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`}
-          />
+          <MoonIcon className={`w-5 h-5 shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`} />
           <div>
             <p className="font-body text-xs text-stone-mid">Overnight low</p>
-            <p className="font-body text-sm font-semibold text-stone-dark">
-              {location.overnightLow}
-            </p>
+            <p className="font-body text-sm font-semibold text-stone-dark">{location.overnightLow}</p>
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <DropletIcon
-            className={`w-5 h-5 shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`}
-          />
+          <DropletIcon className={`w-5 h-5 shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`} />
           <div>
             <p className="font-body text-xs text-stone-mid">Rain probability</p>
-            <p className="font-body text-sm font-semibold text-stone-dark">
-              {location.rainProbability}
-            </p>
+            <p className="font-body text-sm font-semibold text-stone-dark">{location.rainProbability}</p>
           </div>
         </div>
         {location.snow !== "Unlikely" && (
           <div className="flex items-center gap-3">
-            <span
-              className={`text-base shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`}
-              aria-hidden="true"
-            >
-              ❄
-            </span>
+            <span className={`text-base shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`} aria-hidden="true">❄</span>
             <div>
               <p className="font-body text-xs text-stone-mid">Snow</p>
-              <p className="font-body text-sm font-semibold text-stone-dark">
-                {location.snow}
-              </p>
+              <p className="font-body text-sm font-semibold text-stone-dark">{location.snow}</p>
             </div>
           </div>
         )}
         {location.wind !== "—" && (
           <div className="flex items-center gap-3">
-            <WindIcon
-              className={`w-5 h-5 shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`}
-            />
+            <WindIcon className={`w-5 h-5 shrink-0 ${isForest ? "text-forest-600" : "text-water-600"}`} />
             <div>
               <p className="font-body text-xs text-stone-mid">Wind</p>
-              <p className="font-body text-sm font-semibold text-stone-dark">
-                {location.wind}
-              </p>
+              <p className="font-body text-sm font-semibold text-stone-dark">{location.wind}</p>
             </div>
           </div>
         )}
@@ -354,10 +289,16 @@ function WeatherCard({ location }: { location: typeof WEATHER_DATA.plitvice }) {
   );
 }
 
-// --- Main Component ---
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function WeatherPacking() {
   const [checked, setChecked] = useState<Record<string, boolean>>({});
   const [hydrated, setHydrated] = useState(false);
+
+  const headingRef = useScrollReveal<HTMLDivElement>();
+  const weatherRef = useScrollReveal<HTMLDivElement>();
+  const trailRef = useScrollReveal<HTMLDivElement>();
+  const checklistRef = useScrollReveal<HTMLDivElement>();
 
   // Load from localStorage after hydration
   useEffect(() => {
@@ -395,11 +336,14 @@ export default function WeatherPacking() {
     <section id="packing" className="bg-warm-white py-12 px-4 sm:py-16 sm:px-6">
       <div className="max-w-5xl mx-auto">
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div
+          ref={headingRef}
+          className="text-center mb-12 animate-on-scroll"
+        >
           <h2 className="font-heading text-4xl sm:text-5xl text-forest-900 mb-3">
-            Weather & Packing
+            <span className="heading-accent">Weather &amp; Packing</span>
           </h2>
-          <p className="font-body text-stone-mid text-lg">
+          <p className="font-body text-stone-mid text-base sm:text-lg mt-4">
             Know before you go
           </p>
         </div>
@@ -412,35 +356,35 @@ export default function WeatherPacking() {
               "linear-gradient(135deg, var(--color-forest-800) 0%, var(--color-water-800) 100%)",
           }}
         >
-          <span className="text-2xl shrink-0" aria-hidden="true">
-            🧊
-          </span>
+          <span className="text-2xl shrink-0" aria-hidden="true">🧊</span>
           <div>
-            <p className="font-body font-semibold text-white text-sm mb-1">
-              Key insight
-            </p>
+            <p className="font-body font-semibold text-white text-sm mb-1">Key insight</p>
             <p className="font-body text-forest-100 text-sm leading-relaxed">
               Plitvice is <strong className="text-white">3–4°C colder</strong>{" "}
               than Rijeka. Pack as if it'll be{" "}
-              <strong className="text-white">5° colder</strong> than your
-              doorstep.
+              <strong className="text-white">5° colder</strong> than your doorstep.
             </p>
           </div>
         </div>
 
-        {/* Weather comparison */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-8">
-          <WeatherCard location={WEATHER_DATA.plitvice} />
-          <WeatherCard location={WEATHER_DATA.rijeka} />
+        {/* Weather comparison — stacks on mobile */}
+        <div
+          ref={weatherRef}
+          className="animate-on-scroll"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+            <WeatherCard location={WEATHER_DATA.plitvice} />
+            <WeatherCard location={WEATHER_DATA.rijeka} />
+          </div>
         </div>
 
         {/* Sunrise / sunset */}
-        <div className="bg-warm-white rounded-2xl shadow-sm border border-earth-100 p-6 mb-8">
+        <div className="bg-warm-white rounded-2xl shadow-sm border border-earth-100 p-5 sm:p-6 mb-8 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
           <h3 className="font-heading text-lg text-forest-800 mb-4">
-            Sunrise & Sunset — March 2026
+            Sunrise &amp; Sunset — March 2026
           </h3>
           <div className="overflow-x-auto">
-            <table className="w-full text-sm font-body">
+            <table className="w-full min-w-[280px] text-sm font-body">
               <thead>
                 <tr className="border-b border-earth-100">
                   <th className="text-left py-2 pr-4 text-stone-mid font-medium">Date</th>
@@ -461,15 +405,9 @@ export default function WeatherPacking() {
               <tbody>
                 {SUNRISE_SUNSET.map((row) => (
                   <tr key={row.date} className="border-b border-earth-50 last:border-0">
-                    <td className="py-2.5 pr-4 font-medium text-stone-dark">
-                      {row.date}
-                    </td>
-                    <td className="py-2.5 pr-4 text-forest-700 font-semibold tabular-nums">
-                      {row.sunrise}
-                    </td>
-                    <td className="py-2.5 text-water-700 font-semibold tabular-nums">
-                      {row.sunset}
-                    </td>
+                    <td className="py-2.5 pr-4 font-medium text-stone-dark">{row.date}</td>
+                    <td className="py-2.5 pr-4 text-forest-700 font-semibold tabular-nums">{row.sunrise}</td>
+                    <td className="py-2.5 text-water-700 font-semibold tabular-nums">{row.sunset}</td>
                   </tr>
                 ))}
               </tbody>
@@ -482,10 +420,14 @@ export default function WeatherPacking() {
         </div>
 
         {/* Trail conditions */}
-        <div className="mb-8">
+        <div
+          ref={trailRef}
+          className="mb-8 animate-on-scroll"
+        >
           <h3 className="font-heading text-xl text-forest-900 mb-4">
             Trail Conditions
           </h3>
+          {/* Stacks on mobile, 2-col on sm */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {TRAIL_CONDITIONS.map((cond) => (
               <div
@@ -506,9 +448,7 @@ export default function WeatherPacking() {
                 <div>
                   <p
                     className={`font-body text-sm font-semibold mb-1 ${
-                      cond.severity === "warning"
-                        ? "text-earth-800"
-                        : "text-water-800"
+                      cond.severity === "warning" ? "text-earth-800" : "text-water-800"
                     }`}
                   >
                     {cond.title}
@@ -523,14 +463,17 @@ export default function WeatherPacking() {
         </div>
 
         {/* Packing checklist */}
-        <div>
+        <div
+          ref={checklistRef}
+          className="animate-on-scroll"
+        >
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-heading text-xl text-forest-900">
               Packing Checklist
             </h3>
             <button
               onClick={resetAll}
-              className="font-body text-xs text-stone-mid hover:text-earth-700 transition-colors duration-150 underline underline-offset-2"
+              className="font-body text-xs text-stone-mid hover:text-earth-700 transition-colors duration-150 underline underline-offset-2 min-h-[44px] min-w-[44px] flex items-center"
             >
               Reset all
             </button>
@@ -577,7 +520,7 @@ export default function WeatherPacking() {
               return (
                 <div
                   key={cat.category}
-                  className="bg-warm-white rounded-2xl shadow-sm border border-earth-100 p-6"
+                  className="bg-warm-white rounded-2xl shadow-sm border border-earth-100 p-5 sm:p-6"
                 >
                   <div className="flex items-center justify-between mb-4">
                     <h4 className="font-heading text-base font-semibold text-forest-800">
@@ -595,7 +538,7 @@ export default function WeatherPacking() {
                         <li key={item}>
                           <button
                             onClick={() => toggleItem(key)}
-                            className={`w-full flex items-center gap-3 py-2 px-2 rounded-lg text-left transition-colors duration-150 hover:bg-earth-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500 group`}
+                            className="w-full flex items-center gap-3 py-2.5 px-2 rounded-lg text-left transition-colors duration-150 hover:bg-earth-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500 group min-h-[44px]"
                             aria-pressed={isChecked}
                           >
                             {/* Checkbox visual */}
@@ -606,16 +549,12 @@ export default function WeatherPacking() {
                                   : "border-earth-300 bg-white group-hover:border-forest-400"
                               }`}
                             >
-                              {isChecked && (
-                                <CheckIcon className="w-3 h-3 text-white" />
-                              )}
+                              {isChecked && <CheckIcon className="w-3 h-3 text-white" />}
                             </span>
                             {/* Label */}
                             <span
                               className={`font-body text-sm transition-all duration-150 ${
-                                isChecked
-                                  ? "line-through text-stone-mid"
-                                  : "text-stone-dark"
+                                isChecked ? "line-through text-stone-mid" : "text-stone-dark"
                               }`}
                             >
                               {item}

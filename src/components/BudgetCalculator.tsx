@@ -1,6 +1,28 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
+import { useTrip } from "@/context/TripContext";
+
+// --- ID mappings ---
+
+// Map context activity IDs to budget line items
+const ACTIVITY_BUDGET_MAP: Record<string, { label: string; cost: number }[]> = {
+  "rastoke": [
+    { label: "Rastoke entry (2 people)", cost: 10 },
+    { label: "Rastoke parking", cost: 3 },
+  ],
+  "ogulin-museum": [{ label: "Ogulin museum", cost: 8 }],
+  "barac-caves": [{ label: "Barać Caves (2 student tickets)", cost: 20 }],
+};
+
+// Map context accommodation IDs to budget accommodation options
+const ACCOM_ID_MAP: Record<string, string> = {
+  "rustic-lodge": "rustic_lodge",
+  "etno-garden": "etno_garden",
+  "16-lakes": "16_lakes",
+  "degenija": "degenija",
+  "teslas": "tesla",
+};
 
 // --- Types ---
 interface SliderItem {
@@ -8,20 +30,12 @@ interface SliderItem {
   label: string;
   min: number;
   max: number;
-  default: number;
   step: number;
 }
 
-interface ToggleItem {
-  id: string;
-  label: string;
-  cost: number;
-  defaultOn: boolean;
-  note?: string;
-}
-
 interface AccommodationOption {
-  id: string;
+  budgetId: string;
+  contextId: string;
   name: string;
   min: number;
   max: number;
@@ -35,32 +49,28 @@ const FIXED_COSTS = [
 ];
 
 const SLIDER_ITEMS: SliderItem[] = [
-  { id: "anniversary_dinner", label: "Anniversary dinner", min: 50, max: 90, default: 60, step: 5 },
-  { id: "casual_dinner", label: "Casual dinner", min: 30, max: 50, default: 35, step: 5 },
-  { id: "groceries", label: "Groceries & snacks", min: 20, max: 40, default: 25, step: 5 },
-  { id: "coffees", label: "Coffees & misc", min: 10, max: 20, default: 12, step: 2 },
+  { id: "anniversary_dinner", label: "Special dinner", min: 50, max: 90, step: 5 },
+  { id: "casual_dinner", label: "Casual dinner", min: 30, max: 50, step: 5 },
+  { id: "groceries", label: "Groceries & snacks", min: 20, max: 40, step: 5 },
+  { id: "coffees", label: "Coffees & misc", min: 10, max: 20, step: 2 },
 ];
 
-const ACTIVITY_TOGGLES: ToggleItem[] = [
-  { id: "rastoke_entry", label: "Rastoke entry (2 people)", cost: 10, defaultOn: true },
-  { id: "rastoke_parking", label: "Rastoke parking", cost: 3, defaultOn: true },
-  { id: "ogulin_museum", label: "Ogulin museum", cost: 8, defaultOn: false },
-  { id: "barac_caves", label: "Barać Caves (2 student tickets)", cost: 20, defaultOn: false },
-];
+// Context activity IDs that have budget cost entries (free ones omitted)
+const BUDGET_ACTIVITY_IDS = ["rastoke", "ogulin-museum", "barac-caves"] as const;
 
-const GEAR_TOGGLES: ToggleItem[] = [
-  { id: "his_boots", label: "His boots", cost: 55, defaultOn: false, note: "Quechua MH500 Mid" },
-  { id: "her_boots", label: "Her boots", cost: 70, defaultOn: false, note: "Quechua MH500 Mid Women's" },
-  { id: "his_jacket", label: "His jacket", cost: 70, defaultOn: false, note: "Quechua MH500 Rain Jacket" },
-  { id: "her_jacket", label: "Her jacket", cost: 40, defaultOn: false, note: "Quechua MH100 Rain Jacket" },
+const GEAR_TOGGLES = [
+  { id: "his_boots", label: "His boots", cost: 55, note: "Quechua MH500 Mid" },
+  { id: "her_boots", label: "Her boots", cost: 70, note: "Quechua MH500 Mid Women's" },
+  { id: "his_jacket", label: "His jacket", cost: 70, note: "Quechua MH500 Rain Jacket" },
+  { id: "her_jacket", label: "Her jacket", cost: 40, note: "Quechua MH100 Rain Jacket" },
 ];
 
 const ACCOMMODATION_OPTIONS: AccommodationOption[] = [
-  { id: "rustic_lodge", name: "Rustic Lodge", min: 95, max: 130 },
-  { id: "etno_garden", name: "Etno Garden", min: 154, max: 198 },
-  { id: "16_lakes", name: "16 Lakes Hotel", min: 130, max: 230 },
-  { id: "degenija", name: "Hotel Degenija", min: 154, max: 204 },
-  { id: "tesla", name: "Tesla's Gastro Hotel", min: 254, max: 340 },
+  { budgetId: "rustic_lodge", contextId: "rustic-lodge", name: "Rustic Lodge", min: 95, max: 130 },
+  { budgetId: "etno_garden", contextId: "etno-garden", name: "Etno Garden", min: 154, max: 198 },
+  { budgetId: "16_lakes", contextId: "16-lakes", name: "16 Lakes Hotel", min: 130, max: 230 },
+  { budgetId: "degenija", contextId: "degenija", name: "Hotel Degenija", min: 154, max: 204 },
+  { budgetId: "tesla", contextId: "teslas", name: "Tesla's Gastro House", min: 254, max: 340 },
 ];
 
 // --- Sub-components ---
@@ -185,58 +195,100 @@ function AnimatedCost({ value, className }: { value: number; className?: string 
 
 // --- Main Component ---
 export default function BudgetCalculator() {
-  // Park ticket
-  const [studentTicket, setStudentTicket] = useState(true);
+  const {
+    state,
+    toggleActivity,
+    setAccommodation,
+    setStudentTicket,
+    toggleGear,
+    setFoodSlider,
+  } = useTrip();
+
+  const { studentTicket, includedActivities, selectedAccommodation, gearOn, foodSliders } = state;
+
+  const [toastVisible, setToastVisible] = useState(false);
+  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const showToast = useCallback(() => {
+    setToastVisible(true);
+    if (toastTimer.current) clearTimeout(toastTimer.current);
+    toastTimer.current = setTimeout(() => setToastVisible(false), 2000);
+  }, []);
+
+  // Derived values
   const parkCost = studentTicket ? 12 : 20;
-
-  // Sliders
-  const [sliderValues, setSliderValues] = useState<Record<string, number>>(
-    Object.fromEntries(SLIDER_ITEMS.map((s) => [s.id, s.default]))
-  );
-
-  // Activity toggles
-  const [activityOn, setActivityOn] = useState<Record<string, boolean>>(
-    Object.fromEntries(ACTIVITY_TOGGLES.map((t) => [t.id, t.defaultOn]))
-  );
-
-  // Gear toggles
-  const [gearOn, setGearOn] = useState<Record<string, boolean>>(
-    Object.fromEntries(GEAR_TOGGLES.map((t) => [t.id, t.defaultOn]))
-  );
-
-  // Accommodation
-  const [selectedAccomId, setSelectedAccomId] = useState(ACCOMMODATION_OPTIONS[0].id);
-  const selectedAccom = ACCOMMODATION_OPTIONS.find((a) => a.id === selectedAccomId)!;
-
-  const handleSlider = useCallback((id: string, v: number) => {
-    setSliderValues((prev) => ({ ...prev, [id]: v }));
-  }, []);
-
-  const handleActivity = useCallback((id: string, v: boolean) => {
-    setActivityOn((prev) => ({ ...prev, [id]: v }));
-  }, []);
-
-  const handleGear = useCallback((id: string, v: boolean) => {
-    setGearOn((prev) => ({ ...prev, [id]: v }));
-  }, []);
-
-  // Totals
   const fixedTotal = FIXED_COSTS.reduce((sum, f) => sum + f.cost, 0);
-  const foodTotal = SLIDER_ITEMS.reduce((sum, s) => sum + sliderValues[s.id], 0);
-  const activityTotal = ACTIVITY_TOGGLES.reduce(
-    (sum, t) => sum + (activityOn[t.id] ? t.cost : 0),
+
+  const foodTotal = SLIDER_ITEMS.reduce((sum, s) => sum + (foodSliders[s.id] ?? 0), 0);
+
+  // Build activity line items from context's includedActivities
+  const activityLineItems = BUDGET_ACTIVITY_IDS.flatMap((contextId) => {
+    const lines = ACTIVITY_BUDGET_MAP[contextId] ?? [];
+    const isOn = includedActivities.has(contextId);
+    return lines.map((line) => ({ ...line, contextId, isOn }));
+  });
+
+  const activityTotal = activityLineItems.reduce(
+    (sum, item) => sum + (item.isOn ? item.cost : 0),
     0
   );
+
   const gearTotal = GEAR_TOGGLES.reduce(
     (sum, t) => sum + (gearOn[t.id] ? t.cost : 0),
     0
   );
 
+  // Selected accommodation (look up from context ID)
+  const selectedAccomOption =
+    ACCOMMODATION_OPTIONS.find((a) => a.contextId === selectedAccommodation) ??
+    ACCOMMODATION_OPTIONS.find((a) => a.contextId === "degenija")!;
+  const herAccomMid = Math.round((selectedAccomOption.min + selectedAccomOption.max) / 2);
+
   const hisCoreTotal = fixedTotal + parkCost + foodTotal + activityTotal;
-  const herAccomMid = Math.round((selectedAccom.min + selectedAccom.max) / 2);
   const tripTotal = hisCoreTotal + herAccomMid;
   const withGear = tripTotal + gearTotal;
   const gearActive = gearTotal > 0;
+
+  // Handlers
+  const handleSlider = useCallback(
+    (id: string, v: number) => {
+      setFoodSlider(id, v);
+      showToast();
+    },
+    [setFoodSlider, showToast]
+  );
+
+  const handleActivity = useCallback(
+    (contextId: string) => {
+      toggleActivity(contextId);
+      showToast();
+    },
+    [toggleActivity, showToast]
+  );
+
+  const handleGear = useCallback(
+    (id: string) => {
+      toggleGear(id);
+      showToast();
+    },
+    [toggleGear, showToast]
+  );
+
+  const handleAccommodation = useCallback(
+    (contextId: string) => {
+      setAccommodation(contextId);
+      showToast();
+    },
+    [setAccommodation, showToast]
+  );
+
+  const handleStudentTicket = useCallback(
+    (isFullPrice: boolean) => {
+      setStudentTicket(!isFullPrice);
+      showToast();
+    },
+    [setStudentTicket, showToast]
+  );
 
   return (
     <section
@@ -288,7 +340,7 @@ export default function BudgetCalculator() {
                   </span>
                   <Toggle
                     checked={!studentTicket}
-                    onChange={(v) => setStudentTicket(!v)}
+                    onChange={handleStudentTicket}
                     label="Toggle between student and full price ticket"
                   />
                   <span
@@ -313,13 +365,25 @@ export default function BudgetCalculator() {
                   <div key={item.id}>
                     <div className="flex items-center justify-between mb-1">
                       <span className="font-body text-sm text-stone-dark">{item.label}</span>
-                      <span className="font-body text-sm font-semibold text-forest-800 tabular-nums">
-                        €{sliderValues[item.id]}
-                      </span>
+                      <div className="flex items-center gap-0.5">
+                        <span className="font-body text-sm font-semibold text-forest-800">€</span>
+                        <input
+                          type="number"
+                          min={item.min}
+                          max={item.max}
+                          step={item.step}
+                          value={foodSliders[item.id] ?? 0}
+                          onChange={(e) => {
+                            const clamped = Math.min(item.max, Math.max(item.min, Number(e.target.value)));
+                            handleSlider(item.id, clamped);
+                          }}
+                          className="w-16 text-right font-body text-sm font-semibold text-forest-800 tabular-nums bg-transparent border-b border-earth-200 focus:border-forest-500 focus:outline-none py-0.5"
+                        />
+                      </div>
                     </div>
                     <SliderInput
                       item={item}
-                      value={sliderValues[item.id]}
+                      value={foodSliders[item.id] ?? item.min}
                       onChange={handleSlider}
                     />
                     <div className="flex justify-between mt-1">
@@ -338,19 +402,19 @@ export default function BudgetCalculator() {
             {/* Activities */}
             <div className="bg-warm-white rounded-2xl shadow-sm border border-earth-100 p-6">
               <CategoryHeader title="Activities" />
-              {ACTIVITY_TOGGLES.map((t) => (
+              {activityLineItems.map((item) => (
                 <LineItem
-                  key={t.id}
-                  label={t.label}
+                  key={`${item.contextId}-${item.label}`}
+                  label={item.label}
                   control={
                     <Toggle
-                      checked={activityOn[t.id]}
-                      onChange={(v) => handleActivity(t.id, v)}
-                      label={t.label}
+                      checked={item.isOn}
+                      onChange={() => handleActivity(item.contextId)}
+                      label={item.label}
                     />
                   }
-                  cost={t.cost}
-                  dimmed={!activityOn[t.id]}
+                  cost={item.cost}
+                  dimmed={!item.isOn}
                 />
               ))}
               <div className="mt-2 pt-2 border-t border-earth-100 flex justify-between">
@@ -366,34 +430,37 @@ export default function BudgetCalculator() {
                 Estimated at midpoint of price range
               </p>
               <div className="space-y-2">
-                {ACCOMMODATION_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.id}
-                    onClick={() => setSelectedAccomId(opt.id)}
-                    className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-left transition-all duration-150 ${
-                      selectedAccomId === opt.id
-                        ? "border-forest-500 bg-forest-50 shadow-sm"
-                        : "border-earth-100 bg-earth-50 hover:border-earth-300"
-                    }`}
-                  >
-                    <span
-                      className={`font-body text-sm font-medium ${
-                        selectedAccomId === opt.id ? "text-forest-800" : "text-stone-dark"
+                {ACCOMMODATION_OPTIONS.map((opt) => {
+                  const isSelected = selectedAccommodation === opt.contextId;
+                  return (
+                    <button
+                      key={opt.budgetId}
+                      onClick={() => handleAccommodation(opt.contextId)}
+                      className={`w-full flex items-center justify-between px-4 py-3 rounded-xl border text-left transition-all duration-150 ${
+                        isSelected
+                          ? "border-forest-500 bg-forest-50 shadow-sm"
+                          : "border-earth-100 bg-earth-50 hover:border-earth-300"
                       }`}
                     >
-                      {opt.name}
-                    </span>
-                    <span
-                      className={`font-body text-sm tabular-nums ${
-                        selectedAccomId === opt.id
-                          ? "text-forest-700 font-semibold"
-                          : "text-stone-mid"
-                      }`}
-                    >
-                      €{opt.min}–€{opt.max}
-                    </span>
-                  </button>
-                ))}
+                      <span
+                        className={`font-body text-sm font-medium ${
+                          isSelected ? "text-forest-800" : "text-stone-dark"
+                        }`}
+                      >
+                        {opt.name}
+                      </span>
+                      <span
+                        className={`font-body text-sm tabular-nums ${
+                          isSelected
+                            ? "text-forest-700 font-semibold"
+                            : "text-stone-mid"
+                        }`}
+                      >
+                        €{opt.min}–€{opt.max}
+                      </span>
+                    </button>
+                  );
+                })}
               </div>
             </div>
 
@@ -410,13 +477,13 @@ export default function BudgetCalculator() {
                   note={t.note}
                   control={
                     <Toggle
-                      checked={gearOn[t.id]}
-                      onChange={(v) => handleGear(t.id, v)}
+                      checked={gearOn[t.id] ?? false}
+                      onChange={() => handleGear(t.id)}
                       label={t.label}
                     />
                   }
                   cost={t.cost}
-                  dimmed={!gearOn[t.id]}
+                  dimmed={!(gearOn[t.id] ?? false)}
                 />
               ))}
               <div className="mt-2 pt-2 border-t border-earth-100 flex justify-between">
@@ -464,7 +531,7 @@ export default function BudgetCalculator() {
                     <AnimatedCost value={herAccomMid} />
                   </p>
                   <p className="font-body text-xs text-forest-300 mt-1">
-                    {selectedAccom.name} (midpoint est.)
+                    {selectedAccomOption.name} (midpoint est.)
                   </p>
                 </div>
 
@@ -496,8 +563,8 @@ export default function BudgetCalculator() {
 
               {/* Breakdown note */}
               <p className="font-body text-xs text-forest-400 mt-6 leading-relaxed">
-                Accommodation shown as midpoint estimate. Adjust the slider above
-                to reflect your chosen option.
+                Accommodation shown as midpoint estimate. Select your preferred
+                option above to update the total.
               </p>
             </div>
 
@@ -523,6 +590,18 @@ export default function BudgetCalculator() {
           </div>
         </div>
       </div>
+
+      {/* Toast */}
+      {toastVisible && (
+        <div
+          className="fixed bottom-20 left-1/2 -translate-x-1/2 bg-forest-800 text-white px-4 py-2 rounded-full text-sm font-body shadow-lg"
+          style={{ animation: "toast-slide-up 0.2s ease-out" }}
+          role="status"
+          aria-live="polite"
+        >
+          Total updated: €{hisCoreTotal}
+        </div>
+      )}
 
       {/* Slider thumb styling */}
       <style>{`
@@ -555,6 +634,10 @@ export default function BudgetCalculator() {
           appearance: none;
           height: 6px;
           border-radius: 9999px;
+        }
+        @keyframes toast-slide-up {
+          from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+          to   { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
       `}</style>
     </section>

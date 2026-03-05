@@ -18,6 +18,7 @@ const NAV_LINKS: NavItem[] = [
   { label: "Activities", href: "#activities", type: "scroll" },
   { label: "Budget", href: "#budget", type: "scroll" },
   { label: "Packing", href: "#packing", type: "scroll" },
+  { label: "Evenings", href: "#night-guide", type: "scroll" },
   { label: "Map", href: "/map", type: "page" },
 ];
 

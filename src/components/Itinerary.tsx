@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -29,6 +29,32 @@ interface Day {
   subtitle: string;
   options?: DayOption[];
   activities?: Activity[];
+}
+
+// ─── Scroll reveal hook ───────────────────────────────────────────────────────
+
+function useScrollReveal<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.12 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
 }
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -78,7 +104,7 @@ const ITINERARY_DATA: Day[] = [
         time: "19:00",
         title: "Dinner",
         description:
-          "Restaurant Degenija (romantic, anniversary tasting menu) — or Lička Kuća for a more rustic, casual lamb & trout evening.",
+          "Restaurant Degenija (tasting menu, intimate setting) — or Lička Kuća for a more rustic, casual lamb & trout evening.",
         category: "food",
       },
       {
@@ -283,31 +309,31 @@ const CATEGORY_CONFIG: Record<
 > = {
   driving: {
     dot: "bg-earth-400",
-    badge: "bg-earth-100 text-earth-700",
+    badge: "bg-earth-50 text-stone-dark border border-earth-200",
     label: "Driving",
     icon: "🚗",
   },
   nature: {
     dot: "bg-forest-500",
-    badge: "bg-forest-100 text-forest-700",
+    badge: "bg-earth-50 text-stone-dark border border-earth-200",
     label: "Sightseeing",
     icon: "🌿",
   },
   food: {
     dot: "bg-earth-600",
-    badge: "bg-earth-200 text-earth-800",
+    badge: "bg-earth-50 text-stone-dark border border-earth-200",
     label: "Food",
     icon: "🍽️",
   },
   park: {
     dot: "bg-water-500",
-    badge: "bg-water-100 text-water-700",
+    badge: "bg-earth-50 text-stone-dark border border-earth-200",
     label: "Park",
     icon: "💧",
   },
   rest: {
     dot: "bg-earth-300",
-    badge: "bg-earth-50 text-earth-600",
+    badge: "bg-earth-50 text-stone-dark border border-earth-200",
     label: "Rest",
     icon: "☕",
   },
@@ -331,14 +357,14 @@ function Toggle({
       aria-label={label}
       onClick={() => onChange(!checked)}
       className={[
-        "relative inline-flex h-5 w-9 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500",
+        "relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-forest-500 tap-target",
         checked ? "bg-forest-600" : "bg-earth-200",
       ].join(" ")}
     >
       <span
         className={[
-          "pointer-events-none inline-block h-4 w-4 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
-          checked ? "translate-x-4" : "translate-x-0",
+          "pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-sm ring-0 transition duration-200 ease-in-out",
+          checked ? "translate-x-5" : "translate-x-0",
         ].join(" ")}
       />
     </button>
@@ -381,7 +407,7 @@ function ActivityCard({
       </div>
 
       {/* Card */}
-      <div className="bg-warm-white rounded-2xl border border-earth-100 shadow-sm p-3 sm:p-4">
+      <div className="bg-warm-white rounded-2xl border border-earth-100 shadow-sm p-3 sm:p-4 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
         <div className="flex items-start justify-between gap-3 flex-wrap">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -469,13 +495,14 @@ function DayPanel({ day, optionals, onToggle }: {
           <p className="font-body text-sm font-semibold text-stone-mid mb-2 uppercase tracking-wide">
             Choose your morning:
           </p>
-          <div className="flex flex-wrap gap-2">
+          {/* Horizontally scrollable on mobile, wraps on desktop */}
+          <div className="flex gap-2 overflow-x-auto pb-2 scroll-snap-x scrollbar-hidden sm:flex-wrap sm:overflow-visible sm:pb-0">
             {day.options.map((opt, i) => (
               <button
                 key={opt.label}
                 onClick={() => setDay3Option(i)}
                 className={[
-                  "px-4 py-2 rounded-xl text-sm font-body font-medium transition-colors duration-150 border",
+                  "shrink-0 px-4 py-2.5 rounded-xl text-sm font-body font-medium transition-colors duration-150 border min-h-[44px] whitespace-nowrap",
                   day3Option === i
                     ? "bg-forest-700 text-white border-forest-700"
                     : "bg-warm-white text-stone-mid border-earth-200 hover:border-forest-400 hover:text-forest-700",
@@ -514,6 +541,9 @@ export default function Itinerary() {
     rastoke: true,
   });
 
+  const headingRef = useScrollReveal<HTMLDivElement>();
+  const tabsRef = useScrollReveal<HTMLDivElement>();
+
   const handleToggle = (key: string, val: boolean) => {
     setOptionals((prev) => ({ ...prev, [key]: val }));
   };
@@ -528,7 +558,10 @@ export default function Itinerary() {
     >
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="mb-10 text-center">
+        <div
+          ref={headingRef}
+          className="mb-10 text-center animate-on-scroll"
+        >
           <span className="inline-block text-xs font-body font-semibold uppercase tracking-widest text-forest-600 mb-3">
             Day by Day
           </span>
@@ -536,17 +569,18 @@ export default function Itinerary() {
             id="itinerary-heading"
             className="font-heading text-4xl sm:text-5xl text-stone-dark mb-3"
           >
-            Itinerary
+            <span className="heading-accent">Itinerary</span>
           </h2>
-          <p className="font-body text-stone-mid text-base max-w-lg mx-auto">
+          <p className="font-body text-stone-mid text-sm sm:text-base max-w-lg mx-auto mt-4">
             Three days planned to the hour — with wiggle room for detours and
             spontaneity. Toggle optional stops on or off.
           </p>
         </div>
 
-        {/* Day selector tabs */}
+        {/* Day selector tabs — horizontally scrollable with scroll-snap on mobile */}
         <div
-          className="flex gap-2 mb-8 overflow-x-auto pb-1"
+          ref={tabsRef}
+          className="flex gap-2 mb-8 overflow-x-auto pb-2 scroll-snap-x scrollbar-hidden sm:overflow-visible sm:pb-0 animate-on-scroll"
           role="tablist"
           aria-label="Day selector"
         >
@@ -558,7 +592,7 @@ export default function Itinerary() {
               aria-controls={`day-panel-${i}`}
               onClick={() => setActiveDay(i)}
               className={[
-                "shrink-0 min-w-[120px] rounded-2xl px-5 py-3 text-left transition-all duration-200 border",
+                "shrink-0 min-w-[120px] rounded-2xl px-5 py-3 text-left transition-all duration-200 border min-h-[44px]",
                 activeDay === i
                   ? "bg-forest-700 text-white border-forest-700 shadow-md"
                   : "bg-warm-white text-stone-dark border-earth-100 hover:border-forest-300 hover:bg-forest-50",
@@ -580,10 +614,18 @@ export default function Itinerary() {
           ))}
         </div>
 
+        {/* Progress bar */}
+        <div className="h-1 bg-earth-100 rounded-full mb-8 -mt-4">
+          <div
+            className="h-1 bg-forest-600 rounded-full transition-all duration-300"
+            style={{ width: `${((activeDay + 1) / ITINERARY_DATA.length) * 100}%` }}
+          />
+        </div>
+
         {/* Active day header */}
         <div className="flex items-center justify-between mb-6 flex-wrap gap-2">
           <div>
-            <h3 className="font-heading text-2xl text-stone-dark">
+            <h3 className="font-heading text-xl sm:text-2xl text-stone-dark">
               {day.title}
             </h3>
             <p className="font-body text-sm text-stone-mid">

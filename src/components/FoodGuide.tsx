@@ -1,6 +1,34 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+
+// ─── Scroll reveal hook ───────────────────────────────────────────────────────
+
+function useScrollReveal<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
+}
+
+// ─── Types ────────────────────────────────────────────────────────────────────
 
 type Restaurant = {
   id: string;
@@ -14,7 +42,7 @@ type Restaurant = {
   highlights: string[];
   phone?: string;
   closedNote?: string;
-  isAnniversaryPick?: boolean;
+  isTopPick?: boolean;
 };
 
 type FoodItem = {
@@ -24,11 +52,13 @@ type FoodItem = {
   note?: string;
 };
 
+// ─── Data ────────────────────────────────────────────────────────────────────
+
 const restaurants: Restaurant[] = [
   {
     id: "degenija",
     name: "Restaurant Degenija",
-    tag: "Anniversary Pick",
+    tag: "Top Pick",
     rating: "9.2",
     ratingSource: "Booking.com",
     priceRange: "€50-65 for two",
@@ -36,7 +66,7 @@ const restaurants: Restaurant[] = [
     veggieOptions: ["Fresh river trout", "Truffle gnocchi", "Lika cheese plate", "Homemade pizza"],
     highlights: ["Intimate boutique setting", "Best wine list in the area", "On-site at Hotel Degenija", "Booking recommended"],
     phone: "+385 47 782 060",
-    isAnniversaryPick: true,
+    isTopPick: true,
   },
   {
     id: "bistro-plum",
@@ -89,7 +119,7 @@ const regionalFood: FoodItem[] = [
   },
   {
     name: "Fresh River Trout",
-    description: "Caught from the crystal Plitvice waters, pan-fried or grilled simply",
+    description: "Locally farmed river trout, pan-fried or grilled simply",
     isVeggie: false,
     note: "Pescetarian friendly",
   },
@@ -116,11 +146,13 @@ const regionalFood: FoodItem[] = [
 ];
 
 const tagStyles: Record<string, string> = {
-  "Anniversary Pick": "bg-earth-200 text-earth-900",
+  "Top Pick": "bg-earth-200 text-earth-900",
   "Casual Pick": "bg-water-100 text-water-800",
   "Park Lunch": "bg-forest-100 text-forest-800",
   "Special Occasion": "bg-stone-dark/10 text-stone-dark",
 };
+
+// ─── Icons ────────────────────────────────────────────────────────────────────
 
 function LeafIcon({ className }: { className?: string }) {
   return (
@@ -159,23 +191,25 @@ function PhoneIcon({ className }: { className?: string }) {
   );
 }
 
+// ─── Restaurant Card ──────────────────────────────────────────────────────────
+
 function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
-  const isAnniversary = restaurant.isAnniversaryPick === true;
+  const isTopPick = restaurant.isTopPick === true;
 
   return (
     <div
       className={[
-        "relative bg-warm-white rounded-2xl shadow-sm border p-6 flex flex-col gap-4 transition-shadow duration-200 hover:shadow-md",
-        isAnniversary
+        "relative bg-warm-white rounded-2xl shadow-sm border p-6 flex flex-col gap-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
+        isTopPick
           ? "border-earth-400 ring-2 ring-earth-300/40"
           : "border-earth-100",
       ].join(" ")}
     >
-      {/* Anniversary ribbon */}
-      {isAnniversary && (
+      {/* Top pick ribbon */}
+      {isTopPick && (
         <div className="absolute -top-3 left-5 inline-flex items-center gap-1.5 bg-earth-700 text-warm-white text-xs font-body font-semibold px-3 py-1 rounded-full shadow-sm">
           <HeartIcon />
-          Anniversary Dinner
+          Our Top Pick
         </div>
       )}
 
@@ -250,7 +284,7 @@ function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
       {restaurant.phone && (
         <a
           href={`tel:${restaurant.phone}`}
-          className="inline-flex items-center gap-2 text-sm font-body text-water-700 hover:text-water-600 transition-colors duration-200 font-medium"
+          className="inline-flex items-center gap-2 text-sm font-body text-water-700 hover:text-water-600 transition-colors duration-200 font-medium min-h-[44px]"
         >
           <PhoneIcon className="w-4 h-4" />
           {restaurant.phone}
@@ -260,9 +294,11 @@ function RestaurantCard({ restaurant }: { restaurant: Restaurant }) {
   );
 }
 
+// ─── Food Item Card ───────────────────────────────────────────────────────────
+
 function FoodItemCard({ item }: { item: FoodItem }) {
   return (
-    <div className="bg-warm-white rounded-2xl border border-earth-100 p-4 flex flex-col gap-2 shadow-sm">
+    <div className="bg-warm-white rounded-2xl border border-earth-100 p-4 flex flex-col gap-2 shadow-sm hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
       <div className="flex items-start justify-between gap-2">
         <h4 className="font-heading text-base text-stone-dark leading-snug">{item.name}</h4>
         <span
@@ -295,8 +331,14 @@ function FoodItemCard({ item }: { item: FoodItem }) {
   );
 }
 
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function FoodGuide() {
   const [showAllRestaurants, setShowAllRestaurants] = useState(false);
+
+  const headingRef = useScrollReveal<HTMLDivElement>();
+  const restaurantsRef = useScrollReveal<HTMLDivElement>();
+  const foodItemsRef = useScrollReveal<HTMLDivElement>();
 
   const visibleRestaurants = showAllRestaurants ? restaurants : restaurants.slice(0, 3);
 
@@ -304,35 +346,43 @@ export default function FoodGuide() {
     <section id="food" className="py-12 px-4 sm:py-16 sm:px-6 bg-earth-50">
       <div className="max-w-6xl mx-auto">
         {/* Heading */}
-        <div className="text-center mb-4">
+        <div
+          ref={headingRef}
+          className="text-center mb-4 animate-on-scroll"
+        >
           <p className="font-body text-xs tracking-widest uppercase text-earth-600 mb-2">
             Eat Well, Eat Local
           </p>
           <h2 className="font-heading text-4xl sm:text-5xl text-stone-dark mb-3">
-            Food &amp; Dining
+            <span className="heading-accent">Food &amp; Dining</span>
           </h2>
         </div>
 
         {/* Vegetarian/pescetarian note */}
-        <div className="flex items-center justify-center gap-2.5 mb-10 p-3 bg-forest-50 border border-forest-200 rounded-2xl max-w-sm mx-auto">
+        <div className="flex items-center justify-center gap-2.5 mb-10 p-3 bg-forest-50 border border-forest-200 rounded-2xl max-w-sm mx-auto mt-6">
           <LeafIcon className="w-5 h-5 text-forest-600 shrink-0" />
           <p className="font-body text-sm text-forest-800 font-medium">
             Vegetarian and pescetarian options noted below
           </p>
         </div>
 
-        {/* Restaurant grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-          {visibleRestaurants.map((r) => (
-            <RestaurantCard key={r.id} restaurant={r} />
-          ))}
+        {/* Restaurant grid — full-width cards on mobile, 2-col on md */}
+        <div
+          ref={restaurantsRef}
+          className="animate-on-scroll"
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6 mb-6">
+            {visibleRestaurants.map((r) => (
+              <RestaurantCard key={r.id} restaurant={r} />
+            ))}
+          </div>
         </div>
 
         {!showAllRestaurants && restaurants.length > 3 && (
           <div className="text-center mb-12">
             <button
               onClick={() => setShowAllRestaurants(true)}
-              className="inline-flex items-center gap-2 border border-earth-300 hover:border-earth-500 text-stone-dark font-body font-medium text-sm rounded-xl px-5 py-2.5 transition-colors duration-200"
+              className="inline-flex items-center gap-2 border border-earth-300 hover:border-earth-500 text-stone-dark font-body font-medium text-sm rounded-xl px-5 py-3 transition-colors duration-200 min-h-[44px]"
             >
               Show all restaurants
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -358,11 +408,16 @@ export default function FoodGuide() {
           Lika region has its own distinct food culture. These are the dishes worth ordering — many are veggie-friendly or can be adapted.
         </p>
 
-        {/* Food items grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {regionalFood.map((item) => (
-            <FoodItemCard key={item.name} item={item} />
-          ))}
+        {/* Food items grid — single col on mobile, 2-col on sm, 3-col on lg, 4-col on xl */}
+        <div
+          ref={foodItemsRef}
+          className="animate-on-scroll"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {regionalFood.map((item) => (
+              <FoodItemCard key={item.name} item={item} />
+            ))}
+          </div>
         </div>
       </div>
     </section>

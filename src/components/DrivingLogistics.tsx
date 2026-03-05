@@ -14,7 +14,7 @@ const routeStops = [
   {
     id: "ogulin",
     label: "Ogulin",
-    sublabel: "Optional stop — Julin Ponor cave & Fairy Tale Museum",
+    sublabel: "Optional stop — Đulin Ponor cave & Fairy Tale Museum",
     type: "optional" as const,
   },
   {
@@ -73,7 +73,7 @@ const costItems = [
   },
   {
     label: "Total",
-    value: "~€56",
+    value: "€56",
     detail: "Full round trip driving costs",
     icon: (
       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -102,7 +102,7 @@ const phoneNumbers = [
   { label: "Plitvice Park Info", number: "+38553751014", display: "+385 53 751 014" },
   { label: "Restaurant Degenija", number: "+38547782060", display: "+385 47 782 060" },
   { label: "Barac Caves", number: "+38547782113", display: "+385 47 782 113" },
-  { label: "Licka Kuca", number: "+38599276740", display: "+385 99 2767 406" },
+  { label: "Licka Kuca", number: "+385992767406", display: "+385 99 2767 406" },
   { label: "HAK Road Conditions", number: "08009987", display: "0800 9987" },
 ] as const;
 

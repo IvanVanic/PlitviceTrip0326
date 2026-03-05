@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
@@ -66,9 +66,9 @@ const OPEN_CLOSED = {
     "Lake Kozjak boat (likely)",
     "Shuttle train (likely)",
   ],
-  possiblyClosed: [
-    "Entrance 2",
-    "Upper Lakes boardwalks",
+  closed: [
+    "Entrance 2 (closed in winter/March)",
+    "Upper Lakes boardwalks (partial — check locally)",
     "Some elevated trails",
   ],
 };
@@ -177,6 +177,32 @@ const CTA_CHECKLIST = [
   "Is Kozjačka Draga hut open?",
 ];
 
+// ─── Scroll reveal hook ───────────────────────────────────────────────────────
+
+function useScrollReveal<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
@@ -198,6 +224,13 @@ function SectionHeading({ children }: { children: React.ReactNode }) {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function ParkGuide() {
+  const headingRef = useScrollReveal<HTMLDivElement>();
+  const keyNumbersRef = useScrollReveal<HTMLDivElement>();
+  const whatsOpenRef = useScrollReveal<HTMLDivElement>();
+  const routesRef = useScrollReveal<HTMLDivElement>();
+  const gemsRef = useScrollReveal<HTMLDivElement>();
+  const marchRef = useScrollReveal<HTMLDivElement>();
+
   return (
     <section
       id="park-guide"
@@ -206,15 +239,18 @@ export default function ParkGuide() {
     >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
-        <div className="mb-12 text-center">
+        <div
+          ref={headingRef}
+          className="mb-12 text-center animate-on-scroll"
+        >
           <SectionLabel>March Conditions</SectionLabel>
           <h2
             id="park-guide-heading"
             className="font-heading text-4xl sm:text-5xl text-stone-dark mb-3"
           >
-            Park Guide
+            <span className="heading-accent">Park Guide</span>
           </h2>
-          <p className="font-body text-stone-mid text-base max-w-xl mx-auto">
+          <p className="font-body text-stone-mid text-sm sm:text-base max-w-xl mx-auto mt-4">
             Everything you need to know about Plitvice Lakes National Park for
             a late-March visit — prices, routes, what's open, and where to go
             off the beaten path.
@@ -222,15 +258,19 @@ export default function ParkGuide() {
         </div>
 
         {/* ── Key Numbers ─────────────────────────────────────────────────── */}
-        <div className="mb-14">
+        <div
+          ref={keyNumbersRef}
+          className="mb-14 animate-on-scroll"
+        >
           <SectionLabel>At a Glance</SectionLabel>
           <SectionHeading>Key Numbers</SectionHeading>
+          {/* 2-col on mobile, 3-col on sm, 5-col on lg */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2 sm:gap-3">
             {KEY_NUMBERS.map((item) => (
               <div
                 key={item.label}
                 className={[
-                  "rounded-2xl border p-4 flex flex-col gap-2",
+                  "rounded-2xl border p-4 flex flex-col gap-2 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200",
                   item.highlight
                     ? "bg-earth-50 border-earth-300"
                     : "bg-warm-white border-earth-100",
@@ -263,12 +303,16 @@ export default function ParkGuide() {
         </div>
 
         {/* ── What's Open in March ─────────────────────────────────────────── */}
-        <div className="mb-14">
+        <div
+          ref={whatsOpenRef}
+          className="mb-14 animate-on-scroll"
+        >
           <SectionLabel>March Conditions</SectionLabel>
           <SectionHeading>What's Open</SectionHeading>
-          <div className="grid sm:grid-cols-2 gap-4">
+          {/* Stacks on mobile, side-by-side on sm */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {/* Open */}
-            <div className="bg-forest-50 border border-forest-200 rounded-2xl p-5">
+            <div className="bg-forest-50 border border-forest-200 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-6 h-6 rounded-full bg-forest-600 flex items-center justify-center">
                   <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
@@ -290,20 +334,20 @@ export default function ParkGuide() {
               </ul>
             </div>
 
-            {/* Possibly closed */}
-            <div className="bg-earth-50 border border-earth-200 rounded-2xl p-5">
+            {/* Closed / limited */}
+            <div className="bg-earth-50 border border-earth-200 rounded-2xl p-5 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
               <div className="flex items-center gap-2 mb-4">
                 <div className="w-6 h-6 rounded-full bg-earth-400 flex items-center justify-center">
                   <svg className="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4m0 4h.01" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
                   </svg>
                 </div>
                 <h4 className="font-heading text-lg text-earth-800">
-                  Possibly Closed
+                  Closed / Limited
                 </h4>
               </div>
               <ul className="space-y-2">
-                {OPEN_CLOSED.possiblyClosed.map((item) => (
+                {OPEN_CLOSED.closed.map((item) => (
                   <li
                     key={item}
                     className="flex items-start gap-2 font-body text-sm text-earth-700"
@@ -321,15 +365,19 @@ export default function ParkGuide() {
         </div>
 
         {/* ── Routes ──────────────────────────────────────────────────────── */}
-        <div className="mb-14">
+        <div
+          ref={routesRef}
+          className="mb-14 animate-on-scroll"
+        >
           <SectionLabel>Route Comparison</SectionLabel>
           <SectionHeading>Choose Your Route</SectionHeading>
-          <div className="grid sm:grid-cols-2 gap-4">
+          {/* Single col on mobile, 2-col on sm */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {ROUTES.map((route) => (
               <div
                 key={route.name}
                 className={[
-                  "relative rounded-2xl border p-5 transition-all",
+                  "relative rounded-2xl border p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md",
                   route.avoid
                     ? "bg-earth-50 border-earth-200 opacity-60"
                     : route.recommended
@@ -385,14 +433,17 @@ export default function ParkGuide() {
         </div>
 
         {/* ── Hidden Gems ──────────────────────────────────────────────────── */}
-        <div className="mb-14">
+        <div
+          ref={gemsRef}
+          className="mb-14 animate-on-scroll"
+        >
           <SectionLabel>Insider Tips</SectionLabel>
           <SectionHeading>Hidden Gems</SectionHeading>
-          <div className="space-y-3">
+          <div>
             {HIDDEN_GEMS.map((gem) => (
               <div
                 key={gem.num}
-                className="bg-warm-white rounded-2xl border border-earth-100 shadow-sm p-5 flex gap-4"
+                className="border-b border-earth-100 last:border-b-0 py-4 flex gap-4 hover:bg-forest-50/50 rounded-xl px-2 -mx-2 transition-colors duration-150"
               >
                 <div className="shrink-0 w-8 h-8 rounded-full bg-forest-700 text-white flex items-center justify-center font-heading text-sm font-bold">
                   {gem.num}
@@ -411,14 +462,18 @@ export default function ParkGuide() {
         </div>
 
         {/* ── March Advantages ─────────────────────────────────────────────── */}
-        <div className="mb-14">
+        <div
+          ref={marchRef}
+          className="mb-14 animate-on-scroll"
+        >
           <SectionLabel>Why March is Great</SectionLabel>
           <SectionHeading>March Advantages</SectionHeading>
+          {/* 2-col on mobile, 4-col on sm */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
             {MARCH_ADVANTAGES.map((adv) => (
               <div
                 key={adv.label}
-                className="bg-forest-50 border border-forest-100 rounded-2xl p-4 text-center"
+                className="bg-forest-50 border border-forest-100 rounded-2xl p-4 text-center hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
               >
                 <div className="text-2xl mb-2" aria-hidden="true">
                   {adv.icon}
@@ -448,7 +503,7 @@ export default function ParkGuide() {
               </h3>
               <a
                 href="tel:+38553751014"
-                className="font-body text-water-300 text-lg font-semibold hover:text-water-200 transition-colors"
+                className="font-body text-water-300 text-lg font-semibold hover:text-water-200 transition-colors min-h-[44px] inline-flex items-center"
               >
                 +385 53 751 014
               </a>

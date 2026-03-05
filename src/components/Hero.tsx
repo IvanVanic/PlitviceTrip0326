@@ -5,80 +5,58 @@ export default function Hero() {
     <section
       id="hero"
       className="relative min-h-screen flex items-center justify-center overflow-hidden"
-      style={{
-        background:
-          "linear-gradient(160deg, #132b16 0%, #1e3a22 25%, #1a6792 65%, #0c2d4a 100%)",
-      }}
     >
-      {/* Layered gradient overlays for depth */}
-      <div
-        className="absolute inset-0 opacity-40"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 60% at 50% 40%, #2d5a3380 0%, transparent 70%)",
-        }}
-      />
-      <div
-        className="absolute inset-0 opacity-25"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 80% at 70% 60%, #32a3d430 0%, transparent 60%)",
-        }}
+      {/* Background image */}
+      <img
+        src="https://images.unsplash.com/photo-1590074072786-a66914d668f1?w=1920&q=80"
+        alt=""
+        aria-hidden="true"
+        className="absolute inset-0 w-full h-full object-cover"
       />
 
-      {/* Subtle texture pattern */}
-      <div
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage:
-            "repeating-linear-gradient(45deg, #ffffff 0px, #ffffff 1px, transparent 1px, transparent 8px)",
-        }}
-      />
+      {/* Gradient overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/30 to-black/60" />
 
       {/* Content */}
       <div
-        className="relative z-10 text-center px-6 max-w-3xl mx-auto"
+        className="relative z-10 text-center px-5 sm:px-6 max-w-3xl mx-auto w-full"
         style={{ animation: "heroFadeIn 1.4s ease-out both" }}
       >
         {/* Eyebrow label */}
         <div
-          className="inline-flex items-center gap-2 mb-8"
+          className="inline-flex items-center gap-2 mb-6 sm:mb-8"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.1s both" }}
         >
-          <span className="block w-8 h-px bg-water-300 opacity-70" />
-          <span
-            className="text-water-300 text-sm font-body tracking-widest uppercase opacity-90"
-          >
+          <span className="block w-6 sm:w-8 h-px bg-water-300 opacity-70" />
+          <span className="text-water-300 text-xs sm:text-sm font-body tracking-widest uppercase opacity-90">
             Croatia · March 2026
           </span>
-          <span className="block w-8 h-px bg-water-300 opacity-70" />
+          <span className="block w-6 sm:w-8 h-px bg-water-300 opacity-70" />
         </div>
 
         {/* Main heading */}
         <h1
-          className="font-heading text-5xl sm:text-6xl md:text-8xl text-warm-white leading-none mb-4"
+          className="font-heading text-4xl sm:text-6xl md:text-8xl text-white leading-none mb-4"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.2s both" }}
         >
-          Plitvice
-          <br />
-          <span className="text-water-300">Lakes</span>
+          Plitvice Lakes
         </h1>
 
         {/* Subheading */}
         <p
-          className="font-heading text-xl sm:text-2xl text-earth-200 mb-3 italic"
+          className="font-heading text-lg sm:text-2xl text-earth-200 mb-3 italic"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.35s both" }}
         >
-          5th Anniversary Adventure
+          Visual Trip Planner
         </p>
 
         {/* Date badge */}
         <div
-          className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-5 py-2 mb-8 backdrop-blur-sm"
+          className="inline-flex items-center gap-2 bg-white/10 border border-white/20 rounded-full px-4 sm:px-5 py-2 mb-8 backdrop-blur-sm"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.5s both" }}
         >
           <svg
-            className="w-4 h-4 text-water-300"
+            className="w-4 h-4 text-water-300 shrink-0"
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -98,7 +76,7 @@ export default function Hero() {
 
         {/* Description */}
         <p
-          className="font-body text-base sm:text-lg text-earth-100 max-w-xl mx-auto leading-relaxed opacity-90 mb-12"
+          className="font-body text-sm sm:text-lg text-earth-100 max-w-xl mx-auto leading-relaxed opacity-90 mb-10 sm:mb-12 px-2 sm:px-0"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.65s both" }}
         >
           Three days of waterfalls, hidden trails, and the best trout in
@@ -106,18 +84,18 @@ export default function Hero() {
           <span className="text-earth-300">(and way too much research).</span>
         </p>
 
-        {/* CTA row */}
+        {/* CTA row — full-width on mobile, inline on sm+ */}
         <div
-          className="flex flex-col sm:flex-row items-center justify-center gap-4"
+          className="flex flex-col sm:flex-row items-stretch sm:items-center justify-center gap-3 sm:gap-4 w-full sm:w-auto"
           style={{ animation: "heroFadeIn 1.4s ease-out 0.8s both" }}
         >
           <a
             href="#itinerary"
-            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-forest-700 hover:bg-forest-600 text-white font-body font-semibold rounded-xl px-7 py-3 transition-colors duration-200 shadow-lg"
+            className="inline-flex items-center justify-center gap-2 min-h-[44px] bg-forest-700 hover:bg-forest-600 active:bg-forest-800 text-white font-body font-semibold rounded-xl px-7 py-3 transition-colors duration-200 shadow-lg"
           >
             View Itinerary
             <svg
-              className="w-4 h-4"
+              className="w-4 h-4 shrink-0"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -133,24 +111,24 @@ export default function Hero() {
           </a>
           <a
             href="#park-guide"
-            className="inline-flex items-center justify-center gap-2 w-full sm:w-auto border border-white/30 hover:border-white/60 text-white font-body rounded-xl px-7 py-3 transition-colors duration-200 backdrop-blur-sm"
+            className="inline-flex items-center justify-center gap-2 min-h-[44px] border border-white/30 hover:border-white/60 active:border-white/80 text-white font-body rounded-xl px-7 py-3 transition-colors duration-200 backdrop-blur-sm"
           >
             Park Guide
           </a>
         </div>
       </div>
 
-      {/* Scroll indicator */}
+      {/* Scroll indicator — smaller on mobile */}
       <div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/50"
+        className="absolute bottom-6 sm:bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1.5 sm:gap-2 text-white/50"
         style={{ animation: "scrollBounce 2s ease-in-out infinite 2s" }}
         aria-hidden="true"
       >
-        <span className="text-xs font-body tracking-widest uppercase">
+        <span className="text-[10px] sm:text-xs font-body tracking-widest uppercase">
           Scroll
         </span>
         <svg
-          className="w-5 h-5"
+          className="w-4 h-4 sm:w-5 sm:h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"

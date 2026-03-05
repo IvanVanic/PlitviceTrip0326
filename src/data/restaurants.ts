@@ -1,4 +1,4 @@
-export type RestaurantTag = "anniversary" | "casual" | "park-lunch" | "backup";
+export type RestaurantTag = "special" | "casual" | "park-lunch" | "backup";
 
 export interface Restaurant {
   id: string;
@@ -33,12 +33,12 @@ export const restaurants: Restaurant[] = [
     atmosphere:
       "Intimate boutique restaurant attached to Hotel Degenija — warm lighting, attentive service, romantic setting",
     phone: "+385 (0)47 782 060",
-    tag: "anniversary",
+    tag: "special",
     highlights: [
       "Documented for surprising couples with complimentary prosecco",
       "Order peka (slow-cooked meat under bell) 24–48 hours in advance",
       "Kremsnita dessert is a must-order",
-      "Perfect for an anniversary dinner — staff go the extra mile",
+      "Perfect for a special dinner — staff go the extra mile",
       "Pairs perfectly with a stay at Hotel Degenija next door",
     ],
   },

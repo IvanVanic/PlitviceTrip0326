@@ -17,8 +17,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Plitvice Lakes — 5th Anniversary Trip",
-  description: "5th anniversary trip to Plitvice Lakes, March 25-27, 2026",
+  title: "Plitvice Lakes — Trip Planner",
+  description: "Visual trip planner for Plitvice Lakes National Park, March 25-27, 2026",
 };
 
 export default function RootLayout({

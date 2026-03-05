@@ -114,7 +114,7 @@ export const accommodations: Accommodation[] = [
     highlights: [
       "Breakfast included",
       "In-room private hot tub option",
-      "On-site Restaurant Degenija (top anniversary dinner pick)",
+      "On-site Restaurant Degenija (top dinner pick)",
       "No need to drive to dinner — dine in your hotel",
       "Modern interiors with European polish",
       "Adjacent to Rastoke village and Slunj waterfalls",

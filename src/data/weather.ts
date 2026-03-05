@@ -140,7 +140,7 @@ export const packingList: PackingItem[] = [
   },
   {
     id: "smart-casual-dinner",
-    label: "Smart-casual outfit for anniversary dinner",
+    label: "Smart-casual outfit for special dinner",
     category: "clothing",
     essential: true,
     checked: false,

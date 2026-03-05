@@ -1,6 +1,33 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
-// --- Data ---
+// ─── Scroll reveal hook ───────────────────────────────────────────────────────
+
+function useScrollReveal<T extends HTMLElement>() {
+  const ref = useRef<T>(null);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          el.classList.add("is-visible");
+          observer.unobserve(el);
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
+
+  return ref;
+}
+
+// ─── Data ─────────────────────────────────────────────────────────────────────
+
 type ProductItem = {
   name: string;
   price: string;
@@ -109,19 +136,11 @@ const STORES: Store[] = [
   },
 ];
 
-// --- Icons ---
+// ─── Icons ────────────────────────────────────────────────────────────────────
+
 function MapPinIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
       <circle cx="12" cy="10" r="3" />
     </svg>
@@ -130,16 +149,7 @@ function MapPinIcon({ className }: { className?: string }) {
 
 function ClockIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <circle cx="12" cy="12" r="10" />
       <polyline points="12 6 12 12 16 14" />
     </svg>
@@ -148,16 +158,7 @@ function ClockIcon({ className }: { className?: string }) {
 
 function PhoneIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.27h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.7a16 16 0 0 0 6 6l.91-.91a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 21.73 16z" />
     </svg>
   );
@@ -165,16 +166,7 @@ function PhoneIcon({ className }: { className?: string }) {
 
 function TagIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={1.5}
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
       <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z" />
       <line x1="7" y1="7" x2="7.01" y2="7" />
     </svg>
@@ -183,21 +175,17 @@ function TagIcon({ className }: { className?: string }) {
 
 function StarIcon({ className }: { className?: string }) {
   return (
-    <svg
-      className={className}
-      viewBox="0 0 24 24"
-      fill="currentColor"
-      aria-hidden="true"
-    >
+    <svg className={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
       <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
     </svg>
   );
 }
 
-// --- Sub-components ---
+// ─── Sub-components ───────────────────────────────────────────────────────────
+
 function ProductCard({ product }: { product: ProductItem }) {
   return (
-    <div className="bg-earth-50 rounded-xl border border-earth-100 p-4 flex flex-col gap-2">
+    <div className="bg-earth-50 rounded-xl border border-earth-100 p-4 flex flex-col gap-2 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
       <div className="flex items-start justify-between gap-2">
         <p className="font-body text-sm font-semibold text-stone-dark leading-snug flex-1">
           {product.name}
@@ -226,7 +214,7 @@ function StoreCard({ store }: { store: Store }) {
   if (store.primary) {
     return (
       <div
-        className="rounded-2xl p-6 text-white relative overflow-hidden"
+        className="rounded-2xl p-6 text-white relative overflow-hidden hover:-translate-y-0.5 hover:shadow-xl transition-all duration-200"
         style={{
           background:
             "linear-gradient(135deg, var(--color-forest-800) 0%, var(--color-forest-700) 100%)",
@@ -241,16 +229,12 @@ function StoreCard({ store }: { store: Store }) {
         <div className="space-y-3">
           <div className="flex items-start gap-3">
             <MapPinIcon className="w-4 h-4 text-forest-300 shrink-0 mt-0.5" />
-            <span className="font-body text-sm text-forest-100">
-              {store.address}
-            </span>
+            <span className="font-body text-sm text-forest-100">{store.address}</span>
           </div>
           {store.hours && (
             <div className="flex items-center gap-3">
               <ClockIcon className="w-4 h-4 text-forest-300 shrink-0" />
-              <span className="font-body text-sm text-forest-100">
-                {store.hours}
-              </span>
+              <span className="font-body text-sm text-forest-100">{store.hours}</span>
             </div>
           )}
           {store.phone && (
@@ -258,7 +242,7 @@ function StoreCard({ store }: { store: Store }) {
               <PhoneIcon className="w-4 h-4 text-forest-300 shrink-0" />
               <a
                 href={`tel:${store.phone}`}
-                className="font-body text-sm text-forest-100 hover:text-white transition-colors duration-150"
+                className="font-body text-sm text-forest-100 hover:text-white transition-colors duration-150 min-h-[44px] flex items-center"
               >
                 {store.phone}
               </a>
@@ -290,39 +274,41 @@ function StoreCard({ store }: { store: Store }) {
   }
 
   return (
-    <div className="bg-warm-white rounded-xl border border-earth-100 p-4 flex items-start gap-3">
+    <div className="bg-warm-white rounded-xl border border-earth-100 p-4 flex items-start gap-3 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200">
       <MapPinIcon className="w-4 h-4 text-earth-500 shrink-0 mt-1" />
       <div className="flex-1 min-w-0">
-        <p className="font-body text-sm font-semibold text-stone-dark">
-          {store.name}
-        </p>
+        <p className="font-body text-sm font-semibold text-stone-dark">{store.name}</p>
         <p className="font-body text-xs text-stone-mid mt-0.5">{store.address}</p>
         {store.brands && (
-          <p className="font-body text-xs text-forest-700 mt-1">
-            {store.brands}
-          </p>
+          <p className="font-body text-xs text-forest-700 mt-1">{store.brands}</p>
         )}
         {store.note && (
-          <p className="font-body text-xs text-earth-700 mt-1 italic">
-            {store.note}
-          </p>
+          <p className="font-body text-xs text-earth-700 mt-1 italic">{store.note}</p>
         )}
       </div>
     </div>
   );
 }
 
-// --- Main Component ---
+// ─── Main Component ───────────────────────────────────────────────────────────
+
 export default function GearShopping() {
+  const headingRef = useScrollReveal<HTMLDivElement>();
+  const gearRef = useScrollReveal<HTMLDivElement>();
+  const storesRef = useScrollReveal<HTMLDivElement>();
+
   return (
     <section id="gear" className="bg-earth-50 py-12 px-4 sm:py-16 sm:px-6">
       <div className="max-w-5xl mx-auto">
         {/* Heading */}
-        <div className="text-center mb-12">
+        <div
+          ref={headingRef}
+          className="text-center mb-12 animate-on-scroll"
+        >
           <h2 className="font-heading text-4xl sm:text-5xl text-forest-900 mb-3">
-            Gear Up
+            <span className="heading-accent">Gear Up</span>
           </h2>
-          <p className="font-body text-stone-mid text-lg">
+          <p className="font-body text-stone-mid text-base sm:text-lg mt-4">
             Gear needed and where to find it in Rijeka
           </p>
         </div>
@@ -351,38 +337,39 @@ export default function GearShopping() {
           </div>
         </div>
 
-        {/* His & Hers columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-          {(["his", "hers"] as const).map((key) => {
-            const person = GEAR_DATA[key];
-            return (
-              <div
-                key={key}
-                className="bg-warm-white rounded-2xl shadow-sm border border-earth-100 p-6"
-              >
-                <div className="flex items-center gap-3 mb-5">
-                  <div className="w-9 h-9 rounded-full bg-forest-100 flex items-center justify-center shrink-0">
-                    <span className="font-heading text-sm font-bold text-forest-700">
-                      {person.label[0]}
-                    </span>
+        {/* His & Hers columns — stacks on mobile, 2-col on sm */}
+        <div
+          ref={gearRef}
+          className="animate-on-scroll"
+        >
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
+            {(["his", "hers"] as const).map((key) => {
+              const person = GEAR_DATA[key];
+              return (
+                <div
+                  key={key}
+                  className="bg-warm-white rounded-2xl shadow-sm border border-earth-100 p-6"
+                >
+                  <div className="flex items-center gap-3 mb-5">
+                    <div className="w-9 h-9 rounded-full bg-forest-100 flex items-center justify-center shrink-0">
+                      <span className="font-heading text-sm font-bold text-forest-700">
+                        {person.label[0]}
+                      </span>
+                    </div>
+                    <div>
+                      <h3 className="font-heading text-lg text-forest-900">{person.label}</h3>
+                      <p className="font-body text-xs text-stone-mid">Size {person.size}</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="font-heading text-lg text-forest-900">
-                      {person.label}
-                    </h3>
-                    <p className="font-body text-xs text-stone-mid">
-                      Size {person.size}
-                    </p>
+                  <div className="space-y-3">
+                    {person.products.map((product) => (
+                      <ProductCard key={product.name} product={product} />
+                    ))}
                   </div>
                 </div>
-                <div className="space-y-3">
-                  {person.products.map((product) => (
-                    <ProductCard key={product.name} product={product} />
-                  ))}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
 
         {/* Premium alternatives */}
@@ -393,23 +380,18 @@ export default function GearShopping() {
           <p className="font-body text-xs text-stone-mid mb-4">
             Available at Intersport, Hervis, or Iglu Sport
           </p>
+          {/* Stacks on mobile, 2-col on sm */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {PREMIUM_ALTERNATIVES.map((alt) => (
               <div
                 key={alt.name}
-                className="flex items-start gap-3 bg-earth-50 rounded-xl border border-earth-100 p-4"
+                className="flex items-start gap-3 bg-earth-50 rounded-xl border border-earth-100 p-4 hover:-translate-y-0.5 hover:shadow-md transition-all duration-200"
               >
                 <TagIcon className="w-4 h-4 text-earth-600 shrink-0 mt-0.5" />
                 <div>
-                  <p className="font-body text-sm font-semibold text-stone-dark">
-                    {alt.name}
-                  </p>
-                  <p className="font-body text-sm font-bold text-earth-700 mt-0.5 tabular-nums">
-                    {alt.price}
-                  </p>
-                  <p className="font-body text-xs text-stone-mid mt-1 leading-relaxed">
-                    {alt.note}
-                  </p>
+                  <p className="font-body text-sm font-semibold text-stone-dark">{alt.name}</p>
+                  <p className="font-body text-sm font-bold text-earth-700 mt-0.5 tabular-nums">{alt.price}</p>
+                  <p className="font-body text-xs text-stone-mid mt-1 leading-relaxed">{alt.note}</p>
                 </div>
               </div>
             ))}
@@ -417,14 +399,17 @@ export default function GearShopping() {
         </div>
 
         {/* Stores */}
-        <div>
+        <div
+          ref={storesRef}
+          className="animate-on-scroll"
+        >
           <h3 className="font-heading text-xl text-forest-900 mb-4">
             Stores in Rijeka
           </h3>
           <div className="grid grid-cols-1 gap-4">
             {/* Primary store */}
             <StoreCard store={STORES[0]} />
-            {/* Secondary stores */}
+            {/* Secondary stores — 1-col on mobile, 3-col on sm */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {STORES.slice(1).map((store) => (
                 <StoreCard key={store.name} store={store} />
@@ -435,9 +420,7 @@ export default function GearShopping() {
 
         {/* Bottom tip */}
         <div className="mt-8 flex items-start gap-3 bg-forest-50 border border-forest-200 rounded-2xl p-5">
-          <span className="text-xl shrink-0" aria-hidden="true">
-            💡
-          </span>
+          <span className="text-xl shrink-0" aria-hidden="true">💡</span>
           <div>
             <p className="font-body text-sm font-semibold text-forest-800 mb-1">
               Pro tip

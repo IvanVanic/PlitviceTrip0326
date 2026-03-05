@@ -72,7 +72,7 @@ export const budgetItems: BudgetItem[] = [
   // --- FOOD ---
   {
     id: "anniversary-dinner",
-    label: "Anniversary Dinner (Restaurant Degenija)",
+    label: "Special Dinner (Restaurant Degenija)",
     category: "food",
     payer: "his",
     costLow: 50,

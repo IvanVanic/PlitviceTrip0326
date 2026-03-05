@@ -286,12 +286,12 @@ function AccommodationCard({
 
       {/* Search link */}
       <a
-        href={`https://www.google.com/search?q=${encodeURIComponent(acc.bookingSearch)}`}
+        href={`https://www.booking.com/searchresults.html?ss=${encodeURIComponent(acc.name + ' Plitvice')}&checkin=2026-03-25&checkout=2026-03-27&group_adults=2`}
         target="_blank"
         rel="noopener noreferrer"
         className="mt-auto inline-flex items-center justify-center gap-2 bg-forest-700 hover:bg-forest-600 text-white font-body font-semibold text-sm rounded-xl px-4 py-2.5 transition-colors duration-200"
       >
-        Search on Booking.com
+        Find on Booking.com
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
         </svg>

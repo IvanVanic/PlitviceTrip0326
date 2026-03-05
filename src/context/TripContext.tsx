@@ -10,7 +10,7 @@ export interface TripState {
   selectedAccommodation: string;
   // Activities included
   includedActivities: Set<string>;
-  // Food: selected restaurant for anniversary dinner
+  // Food: selected restaurant for special dinner
   anniversaryDinner: string;
   // Student tickets
   studentTicket: boolean;
@@ -18,6 +18,8 @@ export interface TripState {
   day3Option: string;
   // Gear toggles
   gearOn: Record<string, boolean>;
+  // Food slider values (shared with BudgetCalculator)
+  foodSliders: Record<string, number>;
 }
 
 interface TripContextType {
@@ -29,6 +31,7 @@ interface TripContextType {
   setStudentTicket: (v: boolean) => void;
   setDay3Option: (id: string) => void;
   toggleGear: (id: string) => void;
+  setFoodSlider: (id: string, value: number) => void;
   // Computed costs
   costs: TripCosts;
 }
@@ -48,7 +51,7 @@ export interface TripCosts {
 const FIXED_DRIVING = 56; // fuel + tolls + parking
 
 const ACTIVITY_COSTS: Record<string, number> = {
-  rastoke: 10, // 2 people
+  rastoke: 13, // entry €10 + parking €3
   "ogulin-museum": 8,
   "barac-caves": 20, // 2 student
   stargazing: 0,
@@ -71,7 +74,12 @@ const GEAR_COSTS: Record<string, number> = {
   her_jacket: 40,
 };
 
-const FOOD_ESTIMATE = 132; // anniversary dinner + casual dinner + groceries + coffees
+const DEFAULT_FOOD_SLIDERS: Record<string, number> = {
+  anniversary_dinner: 60,
+  casual_dinner: 35,
+  groceries: 25,
+  coffees: 12,
+};
 
 const TripContext = createContext<TripContextType | null>(null);
 
@@ -93,6 +101,7 @@ export function TripProvider({ children }: { children: React.ReactNode }) {
     his_jacket: false,
     her_jacket: false,
   });
+  const [foodSliders, setFoodSliders] = useState<Record<string, number>>(DEFAULT_FOOD_SLIDERS);
 
   const toggleOptionalStop = useCallback((key: string) => {
     setOptionalStops((prev) => ({ ...prev, [key]: !prev[key] }));
@@ -111,6 +120,10 @@ export function TripProvider({ children }: { children: React.ReactNode }) {
     setGearOn((prev) => ({ ...prev, [id]: !prev[id] }));
   }, []);
 
+  const setFoodSlider = useCallback((id: string, value: number) => {
+    setFoodSliders((prev) => ({ ...prev, [id]: value }));
+  }, []);
+
   const costs = useMemo<TripCosts>(() => {
     const parkCost = studentTicket ? 12 : 20;
     const activityCost = Array.from(includedActivities).reduce(
@@ -123,18 +136,19 @@ export function TripProvider({ children }: { children: React.ReactNode }) {
       (sum, [id, on]) => sum + (on ? (GEAR_COSTS[id] ?? 0) : 0),
       0
     );
-    const tripExpenses = FIXED_DRIVING + parkCost + FOOD_ESTIMATE + activityCost;
+    const foodCost = Object.values(foodSliders).reduce((sum, v) => sum + v, 0);
+    const tripExpenses = FIXED_DRIVING + parkCost + foodCost + activityCost;
     return {
       driving: FIXED_DRIVING,
       park: parkCost,
-      food: FOOD_ESTIMATE,
+      food: foodCost,
       activities: activityCost,
       accommodation: { min: accom.min, max: accom.max, mid: accomMid, name: accom.name },
       gear: gearCost,
       totalTrip: tripExpenses + accomMid,
       totalWithGear: tripExpenses + accomMid + gearCost,
     };
-  }, [studentTicket, includedActivities, selectedAccommodation, gearOn]);
+  }, [studentTicket, includedActivities, selectedAccommodation, gearOn, foodSliders]);
 
   const state: TripState = {
     optionalStops,
@@ -144,6 +158,7 @@ export function TripProvider({ children }: { children: React.ReactNode }) {
     studentTicket,
     day3Option,
     gearOn,
+    foodSliders,
   };
 
   return (
@@ -157,6 +172,7 @@ export function TripProvider({ children }: { children: React.ReactNode }) {
         setStudentTicket,
         setDay3Option,
         toggleGear,
+        setFoodSlider,
         costs,
       }}
     >

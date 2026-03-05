@@ -29,7 +29,7 @@ export const itinerary: ItineraryDay[] = [
     label: "Day 1 — Saturday",
     theme: "Drive Down, Waterfalls & First Impressions",
     summary:
-      "Morning departure from Rijeka, scenic stops on the way, arrive at Plitvice in the afternoon, check in, anniversary dinner.",
+      "Morning departure from Rijeka, scenic stops on the way, arrive at Plitvice in the afternoon, check in, special dinner.",
     slots: [
       {
         id: "d1-departure",
@@ -147,15 +147,15 @@ export const itinerary: ItineraryDay[] = [
       {
         id: "d1-dinner",
         time: "19:30",
-        title: "Anniversary Dinner — Restaurant Degenija",
+        title: "Special Dinner — Restaurant Degenija",
         description:
-          "Drive 5 km to Restaurant Degenija for your anniversary dinner. Book in advance and mention the anniversary — staff have been documented surprising couples with complimentary prosecco. Order the peka (slow-roasted under bell) 24–48 hours ahead.",
+          "Drive 5 km to Restaurant Degenija for a special dinner. Book in advance — staff go the extra mile for couples. Order the peka (slow-roasted under bell) 24–48 hours ahead.",
         location: "Restaurant Degenija, Seliste Dreznicko 39",
         cost: "€50–65 for two",
         optional: false,
         restaurantId: "restaurant-degenija",
         tips: [
-          "Call +385 (0)47 782 060 to book and mention the anniversary",
+          "Call +385 (0)47 782 060 to book — mention it's a special occasion",
           "Order peka when booking — it needs 24–48 hours notice",
           "Kremsnita (cream cake) for dessert — do not skip it",
           "Smart-casual dress — this is a proper restaurant",
